@@ -433,6 +433,119 @@ const DashboardPage = () => {
               </div>
             </CardContent>
           </Card>
+            </TabsContent>
+
+            {/* Tab: Transações */}
+            <TabsContent value="transactions" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Todas as Transações</CardTitle>
+                  <CardDescription>Lista completa de transações do sistema</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>ID</TableHead>
+                          <TableHead>CNPJ</TableHead>
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Valor</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Gateway</TableHead>
+                          <TableHead>Data</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {transacoes.length > 0 ? (
+                          transacoes.map((transacao) => (
+                            <TableRow key={transacao.id}>
+                              <TableCell className="font-mono text-xs">
+                                {transacao.id.substring(0, 8)}...
+                              </TableCell>
+                              <TableCell>{transacao.cnpj}</TableCell>
+                              <TableCell className="max-w-[200px] truncate">
+                                {transacao.nome}
+                              </TableCell>
+                              <TableCell className="font-semibold">
+                                {formatarValor(transacao.valor)}
+                              </TableCell>
+                              <TableCell>
+                                {getStatusBadge(transacao.status)}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="uppercase">
+                                  {transacao.gateway}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-600">
+                                {format(new Date(transacao.created_at), 'dd/MM/yy HH:mm', { locale: ptBR })}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                              Nenhuma transação encontrada
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab: Banco CNPJs */}
+            <TabsContent value="database" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Database className="w-5 h-5" />
+                    Banco de CNPJs
+                  </CardTitle>
+                  <CardDescription>
+                    Gerencie o banco de dados de CNPJs para testes
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Stats */}
+                  {cnpjStats && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium">Total CNPJs</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold">{cnpjStats.total}</div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium">Disponíveis</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold text-green-600">{cnpjStats.disponiveis}</div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium">Em Uso</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold text-blue-600">{cnpjStats.em_uso}</div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
+
+                  {/* Uploader */}
+                  <CNPJUploader onUploadComplete={carregarCNPJStats} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       
