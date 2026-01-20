@@ -44,7 +44,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 horas
 
 # Senha do admin (MUDE ISSO EM PRODUÇÃO!)
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
-ADMIN_PASSWORD_HASH = os.getenv('ADMIN_PASSWORD_HASH', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5aeUvF/wMQJ4y')  # senha: admin123
+ADMIN_PASSWORD_HASH = os.getenv('ADMIN_PASSWORD_HASH', '$2b$12$wEuzo3ROd0PvxVU3qY/R/emxzHf2Q849AneS4o7KiVsBxMk7x1E7a')  # senha: admin123
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
