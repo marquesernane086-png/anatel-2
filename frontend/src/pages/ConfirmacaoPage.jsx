@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import GovBrHeader from '@/components/GovBrHeader';
 import GovBrFooter from '@/components/GovBrFooter';
 import { CheckCircle2, Home, Printer, Shield } from 'lucide-react';
