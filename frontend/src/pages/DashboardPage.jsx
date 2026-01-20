@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GovBrHeader from '@/components/GovBrHeader';
 import GovBrFooter from '@/components/GovBrFooter';
+import CNPJUploader from '@/components/CNPJUploader';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -15,7 +17,8 @@ import {
   BarChart3,
   Download,
   RefreshCw,
-  Settings
+  Settings,
+  Database
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
