@@ -34,10 +34,12 @@ const CNPJDirectPage = () => {
         cnpj: cnpjLimpo
       });
       
-      // Redirecionar para página de débitos com os dados
-      navigate('/debitos', { 
+      // Redirecionar para HOME com os dados (mostra tela de confirmação)
+      // Não vai direto para débitos, usuário precisa clicar em "Ver meus débitos"
+      navigate('/', { 
         state: { 
-          dadosEmpresa: response.data 
+          dadosEmpresa: response.data,
+          cnpjConsultado: cnpjLimpo
         },
         replace: true
       });
