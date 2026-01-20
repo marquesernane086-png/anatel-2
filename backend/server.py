@@ -232,29 +232,64 @@ async def root():
 
 @api_router.post("/cnpj/consultar", response_model=CNPJResponse)
 async def consultar_cnpj(data: CNPJConsulta):
-    """Consulta dados do CNPJ - MongoDB primeiro (3M+ registros), API como backup"""
+    """Consulta CNPJ - Estratégia Híbrida Inteligente
+    
+    CAMADA 1: Subset Local (100k-500k CNPJs prioritários) - 1-5ms
+    CAMADA 2: Cache de Consultas (CNPJs já consultados) - 1-5ms  
+    CAMADA 3: API Externa (backup para CNPJs novos) - 500ms-2s
+    CAMADA 4: Mockado Genérico (fallback final) - 1ms
+    
+    O cache cresce organicamente com os CNPJs mais acessados
+    """
     cnpj_limpo = data.cnpj.replace('.', '').replace('/', '').replace('-', '')
     
-    # PASSO 1: Buscar no banco de dados MongoDB (RÁPIDO com índice)
-    # Para 3 milhões de registros, usa índice para busca em ~1-5ms
+    # CAMADA 1: Buscar no SUBSET LOCAL (CNPJs prioritários)
     try:
-        cnpj_doc = await db.cnpjs_database.find_one(
-            {'cnpj': cnpj_limpo},
+        cnpj_doc = await db.cnpjs_subset.find_one(
+            {'cnpj_raw': cnpj_limpo},
             {'_id': 0}
         )
         
         if cnpj_doc:
-            logger.info(f"CNPJ {cnpj_limpo} - Encontrado no banco de dados (índice)")
+            logger.info(f"[SUBSET] CNPJ {cnpj_limpo} encontrado no subset local")
             return CNPJResponse(
                 cnpj=cnpj_doc.get('cnpj_formatado', data.cnpj),
-                nome=cnpj_doc.get('nome', 'Empresa MEI'),
-                situacao=cnpj_doc.get('situacao', 'ATIVA')
+                nome=cnpj_doc.get('razao_social', 'Empresa MEI'),
+                situacao='ATIVA' if cnpj_doc.get('situacao_cadastral') == '02' else 'INATIVA'
             )
     except Exception as e:
-        logger.error(f"Erro ao consultar MongoDB: {e}")
+        logger.error(f"Erro ao consultar subset: {e}")
     
-    # PASSO 2: Não encontrado no BD, consultar API externa como BACKUP
-    logger.info(f"CNPJ {cnpj_limpo} - Não encontrado no BD, consultando API externa...")
+    # CAMADA 2: Buscar no CACHE (CNPJs já consultados anteriormente)
+    try:
+        cache_doc = await db.cnpjs_cache.find_one(
+            {'cnpj_raw': cnpj_limpo},
+            {'_id': 0}
+        )
+        
+        if cache_doc:
+            # Verificar se cache não está muito antigo (opcional: 30 dias)
+            cache_age_days = (datetime.now(timezone.utc) - datetime.fromisoformat(cache_doc['cached_at'])).days
+            
+            if cache_age_days < 30:  # Cache válido por 30 dias
+                logger.info(f"[CACHE HIT] CNPJ {cnpj_limpo} encontrado no cache ({cache_age_days}d)")
+                
+                # Atualizar contador de hits
+                await db.cnpjs_cache.update_one(
+                    {'cnpj_raw': cnpj_limpo},
+                    {'$inc': {'hit_count': 1}, '$set': {'last_accessed': datetime.now(timezone.utc).isoformat()}}
+                )
+                
+                return CNPJResponse(
+                    cnpj=cache_doc.get('cnpj_formatado', data.cnpj),
+                    nome=cache_doc.get('razao_social', 'Empresa MEI'),
+                    situacao=cache_doc.get('situacao', 'ATIVA')
+                )
+    except Exception as e:
+        logger.error(f"Erro ao consultar cache: {e}")
+    
+    # CAMADA 3: Consultar API EXTERNA (backup)
+    logger.info(f"[API EXTERNA] CNPJ {cnpj_limpo} não encontrado localmente, consultando API...")
     
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
@@ -266,18 +301,24 @@ async def consultar_cnpj(data: CNPJConsulta):
                 api_data = response.json()
                 if api_data.get('ResponseDetail'):
                     detail = api_data['ResponseDetail']
-                    logger.info(f"CNPJ {cnpj_limpo} - Obtido da API externa, salvando no BD...")
                     
-                    # Salvar no banco para próxima consulta ser instantânea
-                    novo_cnpj = {
-                        'cnpj': cnpj_limpo,
+                    # SALVAR NO CACHE para próxima consulta ser rápida
+                    cache_doc = {
+                        'cnpj_raw': cnpj_limpo,
                         'cnpj_formatado': detail.get('cnpj', data.cnpj),
-                        'nome': detail.get('nome', 'Empresa MEI'),
+                        'razao_social': detail.get('nome', 'Empresa MEI'),
                         'situacao': detail.get('situacao', 'ATIVA'),
                         'fonte': 'api_externa',
-                        'created_at': datetime.now(timezone.utc).isoformat()
+                        'cached_at': datetime.now(timezone.utc).isoformat(),
+                        'last_accessed': datetime.now(timezone.utc).isoformat(),
+                        'hit_count': 0
                     }
-                    await db.cnpjs_database.insert_one(novo_cnpj)
+                    
+                    try:
+                        await db.cnpjs_cache.insert_one(cache_doc)
+                        logger.info(f"[CACHE SAVE] CNPJ {cnpj_limpo} salvo no cache")
+                    except Exception as e:
+                        logger.warning(f"Erro ao salvar cache: {e}")
                     
                     return CNPJResponse(
                         cnpj=detail.get('cnpj', data.cnpj),
@@ -285,11 +326,28 @@ async def consultar_cnpj(data: CNPJConsulta):
                         situacao=detail.get('situacao', 'ATIVA')
                     )
     except Exception as e:
-        logger.warning(f"API CNPJ falhou: {e}")
+        logger.warning(f"[API EXTERNA] Falhou: {e}")
     
-    # PASSO 3: Fallback - retornar mockado genérico
+    # CAMADA 4: FALLBACK - Mockado genérico
     ultimos_digitos = cnpj_limpo[-4:] if len(cnpj_limpo) >= 4 else "0001"
-    logger.info(f"CNPJ {cnpj_limpo} - Retornando mockado genérico")
+    logger.info(f"[MOCKADO] CNPJ {cnpj_limpo} - usando fallback genérico")
+    
+    # Salvar fallback no cache também
+    cache_doc = {
+        'cnpj_raw': cnpj_limpo,
+        'cnpj_formatado': data.cnpj,
+        'razao_social': f"EMPRESA MEI {ultimos_digitos} LTDA",
+        'situacao': 'ATIVA',
+        'fonte': 'mockado',
+        'cached_at': datetime.now(timezone.utc).isoformat(),
+        'last_accessed': datetime.now(timezone.utc).isoformat(),
+        'hit_count': 0
+    }
+    
+    try:
+        await db.cnpjs_cache.insert_one(cache_doc)
+    except:
+        pass  # Ignorar se já existe
     
     return CNPJResponse(
         cnpj=data.cnpj,
