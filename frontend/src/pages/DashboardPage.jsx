@@ -175,7 +175,19 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Stats Cards */}
+          {/* Tabs */}
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+              <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+              <TabsTrigger value="transactions">Transações</TabsTrigger>
+              <TabsTrigger value="database">
+                <Database className="w-4 h-4 mr-2" />
+                Banco CNPJs
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Tab: Visão Geral */}
+            <TabsContent value="overview" className="space-y-6">{/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
