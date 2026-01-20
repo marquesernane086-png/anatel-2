@@ -14,8 +14,9 @@ import base64
 import json
 
 ROOT_DIR = Path(__file__).parent
-# Carregar .env da raiz do projeto (onde estão as credenciais dos gateways)
-load_dotenv('/app/.env')
+# Carregar .env do backend (MongoDB, CORS) E da raiz (credenciais gateways)
+load_dotenv(ROOT_DIR / '.env')  # Backend .env
+load_dotenv('/app/.env')  # Root .env com credenciais gateways
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
