@@ -37,6 +37,18 @@ PAGLOOP_BASE_URL = os.getenv('PAGLOOP_BASE_URL', 'https://api.pagloop.tech')
 PAGLOOP_CLIENT_ID = os.getenv('PAGLOOP_CLIENT_ID', '')
 PAGLOOP_CLIENT_SECRET = os.getenv('PAGLOOP_CLIENT_SECRET', '')
 
+# Auth Configuration
+SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'seu-secret-key-super-seguro-aqui-mude-isso')
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 horas
+
+# Senha do admin (MUDE ISSO EM PRODUÇÃO!)
+ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD_HASH = os.getenv('ADMIN_PASSWORD_HASH', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5aeUvF/wMQJ4y')  # senha: admin123
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBearer()
+
 # Create the main app
 app = FastAPI(title="MEI Payment System API")
 api_router = APIRouter(prefix="/api")
