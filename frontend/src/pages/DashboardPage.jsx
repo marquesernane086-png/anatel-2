@@ -512,36 +512,38 @@ const DashboardPage = () => {
                 <CardContent className="space-y-6">
                   {/* Stats */}
                   {cnpjStats && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       <Card>
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-sm font-medium">Total CNPJs</CardTitle>
+                          <CardTitle className="text-sm font-medium">Total CNPJs no Banco</CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="text-2xl font-bold">{cnpjStats.total}</div>
+                          <div className="text-3xl font-bold text-blue-600">
+                            {cnpjStats.total_cnpjs?.toLocaleString('pt-BR') || 0}
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">registros importados</p>
                         </CardContent>
                       </Card>
                       <Card>
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-sm font-medium">Disponíveis</CardTitle>
+                          <CardTitle className="text-sm font-medium">Por Situação</CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="text-2xl font-bold text-green-600">{cnpjStats.disponiveis}</div>
-                        </CardContent>
-                      </Card>
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm font-medium">Em Uso</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl font-bold text-blue-600">{cnpjStats.em_uso}</div>
+                          <div className="space-y-1 text-sm">
+                            {cnpjStats.por_situacao?.map((item, idx) => (
+                              <div key={idx} className="flex justify-between">
+                                <span className="text-gray-600">{item._id}:</span>
+                                <span className="font-semibold">{item.count.toLocaleString('pt-BR')}</span>
+                              </div>
+                            ))}
+                          </div>
                         </CardContent>
                       </Card>
                     </div>
                   )}
 
                   {/* Uploader */}
-                  <CNPJUploader onUploadComplete={carregarCNPJStats} />
+                  <CNPJUploader onComplete={carregarCNPJStats} />
                 </CardContent>
               </Card>
             </TabsContent>
