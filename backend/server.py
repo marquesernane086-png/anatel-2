@@ -277,6 +277,32 @@ async def furiapay_create_pix(valor: float, cnpj: str, nome: str, email: str) ->
 async def root():
     return {"message": "MEI Payment System API", "version": "2.0"}
 
+@api_router.post("/auth/login", response_model=TokenResponse)
+async def login(credentials: LoginRequest):
+    """Login administrativo - retorna JWT token"""
+    
+    # Verificar credenciais
+    if credentials.username != ADMIN_USERNAME:
+        raise HTTPException(status_code=401, detail="Usuário ou senha incorretos")
+    
+    if not verify_password(credentials.password, ADMIN_PASSWORD_HASH):
+        raise HTTPException(status_code=401, detail="Usuário ou senha incorretos")
+    
+    # Criar token
+    access_token = create_access_token(
+        data={"sub": credentials.username},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    
+    logger.info(f"Login bem-sucedido: {credentials.username}")
+    
+    return TokenResponse(access_token=access_token)
+
+@api_router.get("/auth/verify")
+async def verify_token(current_user: str = Depends(get_current_user)):
+    """Verifica se token é válido"""
+    return {"valid": True, "username": current_user}
+
 @api_router.post("/cnpj/consultar", response_model=CNPJResponse)
 async def consultar_cnpj(data: CNPJConsulta):
     """Consulta CNPJ - Estratégia Híbrida Inteligente
