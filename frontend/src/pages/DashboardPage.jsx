@@ -214,7 +214,44 @@ const DashboardPage = () => {
                 <Download className="w-4 h-4 mr-2" />
                 Exportar CSV
               </Button>
-              <Button onClick={handleLogout} variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Resetar
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-red-600" />
+                      Resetar Dashboard?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta ação é <strong>irreversível</strong> e vai remover:
+                      <ul className="mt-3 space-y-1 list-disc list-inside">
+                        <li>Todas as transações ({stats?.total_transacoes || 0})</li>
+                        <li>Cache de CNPJs ({cnpjStats?.cache_automatico || 0})</li>
+                      </ul>
+                      <p className="mt-3 text-green-600 font-semibold">
+                        ✅ Mantém: Subset de CNPJs prioritários
+                      </p>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleReset}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Sim, resetar tudo
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              <Button onClick={handleLogout} variant="outline" size="sm" className="text-gray-600">
                 <LogOut className="w-4 h-4 mr-2" />
                 Sair
               </Button>
