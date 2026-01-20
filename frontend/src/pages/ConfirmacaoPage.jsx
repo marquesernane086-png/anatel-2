@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import GovBrHeader from '@/components/GovBrHeader';
 import GovBrFooter from '@/components/GovBrFooter';
 import { CheckCircle2, Home, Printer, Shield } from 'lucide-react';
@@ -44,5 +44,107 @@ const ConfirmacaoPage = () => {
   };
 
   return (
-    <div className=\"min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-blue-50\">\n      <GovBrHeader />\n      
-      <main className=\"flex-1 flex items-center justify-center py-12 px-4\">\n        <Card className=\"max-w-2xl w-full shadow-2xl border-green-200 animate-in fade-in duration-500\">\n          <CardContent className=\"pt-8 pb-8\">\n            {/* Success Icon */}\n            <div className=\"flex justify-center mb-6\">\n              <div className=\"w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-300\">\n                <CheckCircle2 className=\"w-14 h-14 text-white\" />\n              </div>\n            </div>\n\n            {/* Title */}\n            <h1 className=\"text-3xl font-bold text-center text-gray-900 mb-2\">\n              Pagamento Confirmado!\n            </h1>\n            <p className=\"text-center text-gray-600 mb-8\">\n              Seu pagamento foi processado com sucesso\n            </p>\n\n            {/* Payment Info */}\n            <Card className=\"bg-gray-50 mb-6\">\n              <CardContent className=\"pt-6\">\n                <div className=\"space-y-4\">\n                  <div className=\"flex justify-between items-center py-3 border-b border-gray-200\">\n                    <span className=\"font-medium text-gray-600\">Status:</span>\n                    <span className=\"font-bold text-green-600 flex items-center gap-2\">\n                      <CheckCircle2 className=\"w-5 h-5\" />\n                      Confirmado\n                    </span>\n                  </div>\n                  \n                  <div className=\"flex justify-between items-center py-3 border-b border-gray-200\">\n                    <span className=\"font-medium text-gray-600\">Valor:</span>\n                    <span className=\"font-bold text-gray-900 text-xl\">\n                      {formatarValor(valor)}\n                    </span>\n                  </div>\n                  \n                  <div className=\"flex justify-between items-center py-3 border-b border-gray-200\">\n                    <span className=\"font-medium text-gray-600\">CNPJ:</span>\n                    <span className=\"font-semibold text-gray-900\">\n                      {cnpj}\n                    </span>\n                  </div>\n                  \n                  <div className=\"flex justify-between items-center py-3\">\n                    <span className=\"font-medium text-gray-600\">Data/Hora:</span>\n                    <span className=\"font-semibold text-gray-900\">\n                      {dataHora}\n                    </span>\n                  </div>\n                </div>\n              </CardContent>\n            </Card>\n\n            {/* Success Message */}\n            <Alert className=\"border-green-200 bg-green-50 mb-6\">\n              <AlertDescription className=\"text-green-900\">\n                <div className=\"flex items-start gap-3\">\n                  <Shield className=\"w-5 h-5 mt-0.5\" />\n                  <div>\n                    <p className=\"font-bold mb-2\">Obrigado pelo pagamento!</p>\n                    <p className=\"text-sm\">\n                      Seus d\u00e9bitos DAS foram quitados. O cancelamento autom\u00e1tico do seu CNPJ foi evitado.\n                      A baixa ser\u00e1 processada automaticamente em at\u00e9 30 minutos.\n                    </p>\n                  </div>\n                </div>\n              </AlertDescription>\n            </Alert>\n\n            {/* Actions */}\n            <div className=\"flex flex-col sm:flex-row gap-4\">\n              <Button\n                data-testid=\"voltar-inicio-btn\"\n                onClick={voltarInicio}\n                className=\"flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-base\"\n              >\n                <Home className=\"w-5 h-5 mr-2\" />\n                Voltar ao In\u00edcio\n              </Button>\n              \n              <Button\n                data-testid=\"imprimir-btn\"\n                onClick={imprimirComprovante}\n                variant=\"outline\"\n                className=\"flex-1 font-semibold py-6 text-base\"\n              >\n                <Printer className=\"w-5 h-5 mr-2\" />\n                Imprimir Comprovante\n              </Button>\n            </div>\n\n            {/* Security Note */}\n            <p className=\"text-center text-sm text-gray-500 mt-6 flex items-center justify-center gap-2\">\n              <Shield className=\"w-4 h-4\" />\n              Pagamento processado com seguran\u00e7a\n            </p>\n          </CardContent>\n        </Card>\n      </main>\n      \n      <GovBrFooter />\n    </div>\n  );\n};\n\nexport default ConfirmacaoPage;
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-blue-50">
+      <GovBrHeader />
+      
+      <main className="flex-1 flex items-center justify-center py-12 px-4">
+        <Card className="max-w-2xl w-full shadow-2xl border-green-200">
+          <CardContent className="pt-8 pb-8">
+            <div className="flex justify-center mb-6">
+              <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                <CheckCircle2 className="w-14 h-14 text-white" />
+              </div>
+            </div>
+
+            <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
+              Pagamento Confirmado!
+            </h1>
+            <p className="text-center text-gray-600 mb-8">
+              Seu pagamento foi processado com sucesso
+            </p>
+
+            <Card className="bg-gray-50 mb-6">
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="font-medium text-gray-600">Status:</span>
+                    <span className="font-bold text-green-600 flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5" />
+                      Confirmado
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="font-medium text-gray-600">Valor:</span>
+                    <span className="font-bold text-gray-900 text-xl">
+                      {formatarValor(valor)}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="font-medium text-gray-600">CNPJ:</span>
+                    <span className="font-semibold text-gray-900">
+                      {cnpj}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center py-3">
+                    <span className="font-medium text-gray-600">Data/Hora:</span>
+                    <span className="font-semibold text-gray-900">
+                      {dataHora}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Alert className="border-green-200 bg-green-50 mb-6">
+              <AlertDescription className="text-green-900">
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 mt-0.5" />
+                  <div>
+                    <p className="font-bold mb-2">Obrigado pelo pagamento!</p>
+                    <p className="text-sm">
+                      Seus débitos DAS foram quitados. O cancelamento automático do seu CNPJ foi evitado.
+                      A baixa será processada automaticamente em até 30 minutos.
+                    </p>
+                  </div>
+                </div>
+              </AlertDescription>
+            </Alert>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                data-testid="voltar-inicio-btn"
+                onClick={voltarInicio}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-base"
+              >
+                <Home className="w-5 h-5 mr-2" />
+                Voltar ao Início
+              </Button>
+              
+              <Button
+                data-testid="imprimir-btn"
+                onClick={imprimirComprovante}
+                variant="outline"
+                className="flex-1 font-semibold py-6 text-base"
+              >
+                <Printer className="w-5 h-5 mr-2" />
+                Imprimir Comprovante
+              </Button>
+            </div>
+
+            <p className="text-center text-sm text-gray-500 mt-6 flex items-center justify-center gap-2">
+              <Shield className="w-4 h-4" />
+              Pagamento processado com segurança
+            </p>
+          </CardContent>
+        </Card>
+      </main>
+      
+      <GovBrFooter />
+    </div>
+  );
+};
+
+export default ConfirmacaoPage;
