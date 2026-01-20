@@ -346,7 +346,7 @@ async def consultar_cnpj(data: CNPJConsulta):
     
     try:
         await db.cnpjs_cache.insert_one(cache_doc)
-    except:
+    except Exception:
         pass  # Ignorar se já existe
     
     return CNPJResponse(
