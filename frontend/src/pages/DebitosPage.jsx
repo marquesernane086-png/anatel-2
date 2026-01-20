@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import GovBrHeader from '@/components/GovBrHeader';
 import GovBrFooter from '@/components/GovBrFooter';
 import { AlertTriangle, DollarSign, Calendar, CheckCircle2, XCircle, Shield, TrendingUp, Clock } from 'lucide-react';
