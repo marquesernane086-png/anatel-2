@@ -36,6 +36,10 @@ PAGLOOP_BASE_URL = os.getenv('PAGLOOP_BASE_URL', 'https://api.pagloop.tech')
 PAGLOOP_CLIENT_ID = os.getenv('PAGLOOP_CLIENT_ID', '')
 PAGLOOP_CLIENT_SECRET = os.getenv('PAGLOOP_CLIENT_SECRET', '')
 
+# InverTexto API Configuration
+INVERTEXTO_API_TOKEN = os.getenv('INVERTEXTO_API_TOKEN', '')
+INVERTEXTO_BASE_URL = os.getenv('INVERTEXTO_BASE_URL', 'https://api.invertexto.com/v1')
+
 # Auth Configuration
 SECRET_KEY = os.environ['JWT_SECRET_KEY']
 ALGORITHM = "HS256"
