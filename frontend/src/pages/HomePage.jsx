@@ -19,9 +19,19 @@ const HomePage = () => {
   const [dadosEmpresa, setDadosEmpresa] = useState(null);
   const [showDebitos, setShowDebitos] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Verificar se tem CNPJ na URL (query string ?cnpj=)
+  // Verificar se tem CNPJ na URL (query string ?cnpj=) ou vindo do link único
   useEffect(() => {
+    // Dados vindos do link único (CNPJDirectPage)
+    if (location.state?.dadosEmpresa) {
+      setDadosEmpresa(location.state.dadosEmpresa);
+      setCnpj(location.state.cnpjConsultado || '');
+      setShowDebitos(true);
+      return;
+    }
+    
+    // Ou CNPJ via query string (?cnpj=)
     const urlParams = new URLSearchParams(window.location.search);
     const cnpjUrl = urlParams.get('cnpj');
     if (cnpjUrl) {
@@ -29,7 +39,7 @@ const HomePage = () => {
       consultarCNPJ(cnpjUrl);
     }
     // eslint-disable-next-line
-  }, []);
+  }, [location]);
 
   const consultarCNPJ = async (cnpjConsulta) => {
     const cnpjLimpo = cnpjConsulta || cnpj;
