@@ -466,16 +466,40 @@ async def verify_token(current_user: str = Depends(get_current_user)):
 
 @api_router.post("/cnpj/consultar", response_model=CNPJResponse)
 async def consultar_cnpj(data: CNPJConsulta):
-    """Consulta CNPJ - API InverTexto PRINCIPAL
+    """Consulta dados do CNPJ - Prioriza base de leads local"""
+    cnpj_limpo = data.cnpj.replace(".", "").replace("/", "").replace("-", "")
     
-    ESTRATÉGIA SIMPLIFICADA:
-    1. Cache (se já consultado antes) - 1-5ms
-    2. API InverTexto (dados oficiais) - 500ms-1s
-    3. Mockado (fallback) - <1ms
-    """
-    cnpj_limpo = data.cnpj.replace('.', '').replace('/', '').replace('-', '')
+    # PASSO 0: Verificar BASE DE LEADS primeiro (prioridade máxima)
+    try:
+        lead = await db.leads_anatel.find_one({'cnpj': cnpj_limpo}, {'_id': 0})
+        
+        if lead:
+            logger.info(f"[LEADS] CNPJ {cnpj_limpo} encontrado na base de leads!")
+            
+            # Marcar como visualizado
+            await db.leads_anatel.update_one(
+                {'cnpj': cnpj_limpo},
+                {'$set': {'visualizado': True, 'data_visualizacao': datetime.now(timezone.utc).isoformat()}}
+            )
+            
+            # Formatar telefone
+            telefone = lead.get('telefone', '')
+            if telefone and len(telefone) >= 10:
+                telefone_formatado = f"({telefone[:2]}) {telefone[2:]}"
+            else:
+                telefone_formatado = telefone
+            
+            return CNPJResponse(
+                cnpj=data.cnpj,
+                nome=lead.get('razao_social', 'Empresa'),
+                situacao='ATIVA',
+                telefone=telefone_formatado,
+                is_lead=True
+            )
+    except Exception as e:
+        logger.error(f"[LEADS] Erro ao consultar: {e}")
     
-    # PASSO 1: Verificar CACHE primeiro (mais rápido)
+    # PASSO 1: Verificar CACHE
     try:
         cache_doc = await db.cnpjs_cache.find_one(
             {'cnpj_raw': cnpj_limpo},
@@ -485,7 +509,7 @@ async def consultar_cnpj(data: CNPJConsulta):
         if cache_doc:
             cache_age_days = (datetime.now(timezone.utc) - datetime.fromisoformat(cache_doc['cached_at'])).days
             
-            if cache_age_days < 7:  # Cache válido por 7 dias
+            if cache_age_days < 7:
                 logger.info(f"[CACHE] CNPJ {cnpj_limpo} encontrado ({cache_age_days}d)")
                 
                 await db.cnpjs_cache.update_one(
@@ -496,7 +520,9 @@ async def consultar_cnpj(data: CNPJConsulta):
                 return CNPJResponse(
                     cnpj=cache_doc.get('cnpj_formatado', data.cnpj),
                     nome=cache_doc.get('razao_social', 'Empresa'),
-                    situacao=cache_doc.get('situacao', 'ATIVA')
+                    situacao=cache_doc.get('situacao', 'ATIVA'),
+                    telefone=None,
+                    is_lead=False
                 )
     except Exception as e:
         logger.error(f"Erro cache: {e}")
@@ -538,7 +564,9 @@ async def consultar_cnpj(data: CNPJConsulta):
                     return CNPJResponse(
                         cnpj=api_data.get('cnpj', data.cnpj),
                         nome=api_data.get('razao_social', 'Empresa'),
-                        situacao=cache_doc['situacao']
+                        situacao=cache_doc['situacao'],
+                        telefone=None,
+                        is_lead=False
                     )
                 else:
                     logger.warning(f"[INVERTEXTO] Status não-200: {response.status_code}")
@@ -554,7 +582,9 @@ async def consultar_cnpj(data: CNPJConsulta):
     return CNPJResponse(
         cnpj=data.cnpj,
         nome=f"EMPRESA MEI {ultimos_digitos} LTDA",
-        situacao="ATIVA"
+        situacao="ATIVA",
+        telefone=None,
+        is_lead=False
     )
 
 @api_router.get("/cnpj/{cnpj}/debitos", response_model=DebitosResponse)
