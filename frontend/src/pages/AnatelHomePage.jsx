@@ -237,8 +237,9 @@ const AnatelHomePage = () => {
                   <h3 className="font-bold text-gray-900">Quem deve pagar?</h3>
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  Todas as empresas que possuem autorização para prestar serviços de telecomunicações 
-                  ou operar estações de radiocomunicação são obrigadas ao pagamento da TFF anualmente.
+                  <strong>Toda empresa ou pessoa física</strong> que possui linha telefônica ativa 
+                  (fixa ou móvel) vinculada ao seu CNPJ/CPF está sujeita ao pagamento da Taxa de 
+                  Fiscalização de Funcionamento (TFF) referente ao serviço de telecomunicações.
                 </p>
               </CardContent>
             </Card>
