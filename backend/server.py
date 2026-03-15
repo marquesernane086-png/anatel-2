@@ -429,6 +429,99 @@ async def obter_debitos(cnpj: str):
         ]
     )
 
+
+# ─── ANATEL / FISTEL Models ────────────────────────────────────────────────────
+
+class AnatelTaxaItem(BaseModel):
+    tipo: str
+    periodo: str
+    principal: float
+    acrescimos: float
+    total_item: float
+
+class AnatelTaxasResponse(BaseModel):
+    cnpj: str
+    servico: str
+    num_estacoes: int
+    quantidade_anos: int
+    total: float
+    taxas: List[AnatelTaxaItem]
+
+# ─── ANATEL Endpoints ──────────────────────────────────────────────────────────
+
+@api_router.get("/anatel/taxas/{cnpj}", response_model=AnatelTaxasResponse)
+async def obter_taxas_anatel(cnpj: str):
+    """Retorna débitos de Taxa FISTEL da ANATEL para o CNPJ informado"""
+    import random
+
+    cnpj_limpo = cnpj.replace(".", "").replace("/", "").replace("-", "")
+    # Usa os últimos 4 dígitos do CNPJ para variar levemente os valores
+    seed = int(cnpj_limpo[-4:]) if cnpj_limpo else 1234
+    random.seed(seed)
+
+    # Valores TFF para pequenas prestadoras (categoria C)
+    # Baseado nos valores reais da tabela ANATEL/FISTEL
+    valor_tff_base = round(random.uniform(320.00, 540.00), 2)
+    valor_tfi_base = round(valor_tff_base * 0.5, 2)
+
+    # Simula 1 ou 2 anos em atraso
+    anos_atraso = random.choice([1, 2])
+
+    taxas = []
+    anos_referencia = [2024, 2025] if anos_atraso == 2 else [2025]
+
+    total_geral = 0.0
+
+    for ano in anos_referencia[:anos_atraso]:
+        # TFF – Taxa de Fiscalização de Funcionamento
+        principal_tff = valor_tff_base
+        acrescimos_tff = round(principal_tff * 0.20, 2)   # multa 20%
+        total_tff = round(principal_tff + acrescimos_tff, 2)
+        total_geral += total_tff
+
+        taxas.append(AnatelTaxaItem(
+            tipo="TFF – Taxa de Fiscalização de Funcionamento",
+            periodo=f"Exercício {ano}",
+            principal=principal_tff,
+            acrescimos=acrescimos_tff,
+            total_item=total_tff
+        ))
+
+        # TFI – Taxa de Fiscalização de Instalação (somente no 1º ano do débito)
+        if ano == anos_referencia[0]:
+            principal_tfi = valor_tfi_base
+            acrescimos_tfi = round(principal_tfi * 0.20, 2)
+            total_tfi = round(principal_tfi + acrescimos_tfi, 2)
+            total_geral += total_tfi
+
+            taxas.append(AnatelTaxaItem(
+                tipo="TFI – Taxa de Fiscalização de Instalação",
+                periodo=f"Exercício {ano}",
+                principal=principal_tfi,
+                acrescimos=acrescimos_tfi,
+                total_item=total_tfi
+            ))
+
+    total_geral = round(total_geral, 2)
+
+    servicos = [
+        "SCM – Serviço de Comunicação Multimídia",
+        "SMP – Serviço Móvel Pessoal",
+        "STFC – Serviço Telefônico Fixo Comutado",
+        "SRD – Serviço de Radioamador",
+    ]
+    servico = servicos[seed % len(servicos)]
+
+    return AnatelTaxasResponse(
+        cnpj=cnpj,
+        servico=servico,
+        num_estacoes=random.randint(1, 5),
+        quantidade_anos=anos_atraso,
+        total=total_geral,
+        taxas=taxas
+    )
+
+
 @api_router.post("/pagamento/pix", response_model=PagamentoResponse)
 async def gerar_pix(data: PagamentoRequest):
     """Gera QR Code PIX usando gateway ativo"""

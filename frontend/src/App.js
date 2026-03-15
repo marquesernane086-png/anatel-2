@@ -8,6 +8,11 @@ import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import CNPJDirectPage from './pages/CNPJDirectPage';
 import ProtectedRoute from './components/ProtectedRoute';
+// Páginas ANATEL
+import AnatelHomePage from './pages/AnatelHomePage';
+import AnatelDebitosPage from './pages/AnatelDebitosPage';
+import AnatelPagamentoPage from './pages/AnatelPagamentoPage';
+import AnatelConfirmacaoPage from './pages/AnatelConfirmacaoPage';
 import './App.css';
 
 function App() {
@@ -28,6 +33,11 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          {/* Rotas ANATEL */}
+          <Route path="/anatel" element={<AnatelHomePage />} />
+          <Route path="/anatel/debitos" element={<AnatelDebitosPage />} />
+          <Route path="/anatel/pagamento" element={<AnatelPagamentoPage />} />
+          <Route path="/anatel/confirmacao" element={<AnatelConfirmacaoPage />} />
           {/* Rota dinâmica para CNPJ direto na URL */}
           <Route path="/:cnpj" element={<CNPJDirectPage />} />
         </Routes>
