@@ -169,7 +169,7 @@ const AnatelHomePage = () => {
                           <p className="font-bold text-gray-900 uppercase text-xs">{dadosEmpresa?.nome || 'N/A'}</p>
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 mb-1">
                         <FileText className="w-4 h-4 text-[#003580] shrink-0 mt-0.5" />
                         <div>
                           <p className="text-xs text-gray-500">CNPJ</p>
@@ -178,7 +178,22 @@ const AnatelHomePage = () => {
                           </p>
                         </div>
                       </div>
+                      {dadosEmpresa?.telefone && (
+                        <div className="flex gap-2">
+                          <Phone className="w-4 h-4 text-[#003580] shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-xs text-gray-500">Linha vinculada</p>
+                            <p className="font-bold text-gray-900 text-xs">{dadosEmpresa.telefone}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
+
+                    {dadosEmpresa?.telefone && (
+                      <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-2 font-semibold">
+                        ⚠️ Taxa de Fiscalização vinculada à linha <strong>{dadosEmpresa.telefone}</strong>
+                      </p>
+                    )}
 
                     <p className="text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded-lg p-2">
                       Foram identificados débitos de <strong>Taxa FISTEL</strong> em aberto. Regularize para manter sua licença ativa.
