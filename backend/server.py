@@ -36,6 +36,12 @@ PAGLOOP_BASE_URL = os.getenv('PAGLOOP_BASE_URL', 'https://api.pagloop.tech')
 PAGLOOP_CLIENT_ID = os.getenv('PAGLOOP_CLIENT_ID', '')
 PAGLOOP_CLIENT_SECRET = os.getenv('PAGLOOP_CLIENT_SECRET', '')
 
+# Zippify API Configuration (Gateway Principal)
+ZIPPIFY_BASE_URL = os.getenv('ZIPPIFY_BASE_URL', 'https://api.zippify.com.br/api/public/v1')
+ZIPPIFY_API_TOKEN = os.getenv('ZIPPIFY_API_TOKEN', 'pqWpAXkg9tAdxAm07xAQ4d6IODUw6C5Y0u7oL0CpfN92RFfpsqvJRkDpPqhU')
+ZIPPIFY_OFFER_HASH = os.getenv('ZIPPIFY_OFFER_HASH', 'xfwh7be0ef')
+ZIPPIFY_PRODUCT_HASH = os.getenv('ZIPPIFY_PRODUCT_HASH', 'rrabdugdeq')
+
 # InverTexto API Configuration
 INVERTEXTO_API_TOKEN = os.getenv('INVERTEXTO_API_TOKEN', '')
 INVERTEXTO_BASE_URL = os.getenv('INVERTEXTO_BASE_URL', 'https://api.invertexto.com/v1')
