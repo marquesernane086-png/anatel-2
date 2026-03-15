@@ -1,14 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
-import HomePage from './pages/HomePage';
-import DebitosPage from './pages/DebitosPage';
-import PagamentoPage from './pages/PagamentoPage';
-import ConfirmacaoPage from './pages/ConfirmacaoPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
-import CNPJDirectPage from './pages/CNPJDirectPage';
 import ProtectedRoute from './components/ProtectedRoute';
-// Páginas ANATEL
+// Páginas ANATEL (Principal)
 import AnatelHomePage from './pages/AnatelHomePage';
 import AnatelDebitosPage from './pages/AnatelDebitosPage';
 import AnatelPagamentoPage from './pages/AnatelPagamentoPage';
@@ -20,10 +15,16 @@ function App() {
     <BrowserRouter>
       <div className="App min-h-screen bg-gray-50">
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/debitos" element={<DebitosPage />} />
-          <Route path="/pagamento" element={<PagamentoPage />} />
-          <Route path="/confirmacao" element={<ConfirmacaoPage />} />
+          {/* Redireciona "/" para "/anatel" */}
+          <Route path="/" element={<Navigate to="/anatel" replace />} />
+          
+          {/* Rotas ANATEL - Sistema Principal */}
+          <Route path="/anatel" element={<AnatelHomePage />} />
+          <Route path="/anatel/debitos" element={<AnatelDebitosPage />} />
+          <Route path="/anatel/pagamento" element={<AnatelPagamentoPage />} />
+          <Route path="/anatel/confirmacao" element={<AnatelConfirmacaoPage />} />
+          
+          {/* Admin */}
           <Route path="/login" element={<LoginPage />} />
           <Route 
             path="/dashboard" 
@@ -33,13 +34,6 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          {/* Rotas ANATEL */}
-          <Route path="/anatel" element={<AnatelHomePage />} />
-          <Route path="/anatel/debitos" element={<AnatelDebitosPage />} />
-          <Route path="/anatel/pagamento" element={<AnatelPagamentoPage />} />
-          <Route path="/anatel/confirmacao" element={<AnatelConfirmacaoPage />} />
-          {/* Rota dinâmica para CNPJ direto na URL */}
-          <Route path="/:cnpj" element={<CNPJDirectPage />} />
         </Routes>
         <Toaster position="top-center" />
       </div>
