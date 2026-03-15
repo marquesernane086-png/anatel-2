@@ -9,7 +9,7 @@ import AnatelHeader from '@/components/AnatelHeader';
 import AnatelFooter from '@/components/AnatelFooter';
 import {
   AlertTriangle, Building2, Search, Radio, FileText,
-  Shield, CheckCircle2, Info
+  Shield, CheckCircle2, Info, Phone
 } from 'lucide-react';
 import { toast } from 'sonner';
 
