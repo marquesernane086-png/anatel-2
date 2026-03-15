@@ -76,6 +76,8 @@ class CNPJResponse(BaseModel):
     cnpj: str
     nome: str
     situacao: str
+    telefone: Optional[str] = None
+    is_lead: bool = False
 
 class DebitoItem(BaseModel):
     mes: str
