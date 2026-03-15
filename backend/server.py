@@ -627,26 +627,19 @@ async def obter_taxas_anatel(cnpj: str):
 
 @api_router.post("/pagamento/pix", response_model=PagamentoResponse)
 async def gerar_pix(data: PagamentoRequest):
-    """Gera QR Code PIX usando gateway ativo"""
-    gateway = get_active_gateway()
+    """Gera QR Code PIX usando Zippify (gateway principal)"""
     
-    logger.info(f"Gerando PIX via {gateway.upper()} - Valor: R$ {data.valor}")
+    logger.info(f"[PIX] Gerando via ZIPPIFY - Valor: R$ {data.valor}")
     
     try:
-        if gateway == 'pagloop':
-            result = await pagloop_create_pix(
-                valor=data.valor,
-                cnpj=data.cnpj,
-                nome=data.nome,
-                email=data.email or "contato@mei.com"
-            )
-        else:  # furiapay
-            result = await furiapay_create_pix(
-                valor=data.valor,
-                cnpj=data.cnpj,
-                nome=data.nome,
-                email=data.email or "contato@mei.com"
-            )
+        # Usar Zippify como gateway principal
+        result = await zippify_create_pix(
+            valor=data.valor,
+            cnpj=data.cnpj,
+            nome=data.nome,
+            email=data.email or "contato@empresa.com",
+            phone="11999999999"
+        )
         
         # Salvar transação no MongoDB
         transaction = {
