@@ -600,20 +600,19 @@ async def obter_taxas_anatel(cnpj: str):
     seed = int(cnpj_limpo[-4:]) if cnpj_limpo else 1234
     random.seed(seed)
 
-    # Valores TFF para pequenas prestadoras (categoria C)
-    # Baseado nos valores reais da tabela ANATEL/FISTEL
-    valor_tff_base = round(random.uniform(320.00, 540.00), 2)
-    valor_tfi_base = round(valor_tff_base * 0.5, 2)
+    # Valores ajustados para total em torno de R$ 60,00
+    # Principal base entre R$ 40 e R$ 50 (com 20% de multa = R$ 48 a R$ 60)
+    valor_tff_base = round(random.uniform(45.00, 52.00), 2)
 
-    # Simula 1 ou 2 anos em atraso
-    anos_atraso = random.choice([1, 2])
+    # Apenas 1 ano em atraso para manter valor baixo
+    anos_atraso = 1
 
     taxas = []
-    anos_referencia = [2024, 2025] if anos_atraso == 2 else [2025]
+    anos_referencia = [2025]
 
     total_geral = 0.0
 
-    for ano in anos_referencia[:anos_atraso]:
+    for ano in anos_referencia:
         # TFF – Taxa de Fiscalização de Funcionamento
         principal_tff = valor_tff_base
         acrescimos_tff = round(principal_tff * 0.20, 2)   # multa 20%
@@ -628,21 +627,6 @@ async def obter_taxas_anatel(cnpj: str):
             total_item=total_tff
         ))
 
-        # TFI – Taxa de Fiscalização de Instalação (somente no 1º ano do débito)
-        if ano == anos_referencia[0]:
-            principal_tfi = valor_tfi_base
-            acrescimos_tfi = round(principal_tfi * 0.20, 2)
-            total_tfi = round(principal_tfi + acrescimos_tfi, 2)
-            total_geral += total_tfi
-
-            taxas.append(AnatelTaxaItem(
-                tipo="TFI – Taxa de Fiscalização de Instalação",
-                periodo=f"Exercício {ano}",
-                principal=principal_tfi,
-                acrescimos=acrescimos_tfi,
-                total_item=total_tfi
-            ))
-
     total_geral = round(total_geral, 2)
 
     servicos = [
@@ -656,7 +640,7 @@ async def obter_taxas_anatel(cnpj: str):
     return AnatelTaxasResponse(
         cnpj=cnpj,
         servico=servico,
-        num_estacoes=random.randint(1, 5),
+        num_estacoes=1,
         quantidade_anos=anos_atraso,
         total=total_geral,
         taxas=taxas
