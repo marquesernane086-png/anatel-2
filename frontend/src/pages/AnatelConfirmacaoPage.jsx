@@ -19,7 +19,7 @@ export default function AnatelConfirmacaoPage() {
   const cpfUtilizado = location.state?.cpfUtilizado || null;
 
   const [mostrar2026, setMostrar2026] = useState(true);
-  const valorTFF2026 = 57.38;
+  const valorTFF2026 = 5.00; // TESTE
 
   const dataHoje = new Date().toLocaleDateString('pt-BR', {
     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'

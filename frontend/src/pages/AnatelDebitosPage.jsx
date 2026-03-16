@@ -116,7 +116,7 @@ export default function AnatelDebitosPage() {
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span className="text-gray-600 text-sm uppercase">Principal</span>
-                    <span className="text-[#071D41] font-semibold">{fmt(taxas?.taxas?.[0]?.principal || 57.38)}</span>
+                    <span className="text-[#071D41] font-semibold">{fmt(taxas?.taxas?.[0]?.principal || 5.00)}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span className="text-gray-600 text-sm uppercase">Multa e Acréscimos</span>
