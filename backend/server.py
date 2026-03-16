@@ -290,12 +290,12 @@ def gerar_cpf_valido() -> str:
     """Gera um CPF válido aleatório para cada transação
     
     A API Zippify requer CPF válido e trata como mesmo cliente se repetir.
-    Gerando CPF único para cada transação.
+    Gerando CPF único para cada transação usando secrets para garantir aleatoriedade.
     """
-    import random
+    import secrets
     
-    # Gera os 9 primeiros dígitos aleatoriamente
-    cpf = [random.randint(0, 9) for _ in range(9)]
+    # Gera os 9 primeiros dígitos aleatoriamente usando secrets (não afetado por random.seed)
+    cpf = [secrets.randbelow(10) for _ in range(9)]
     
     # Calcula o primeiro dígito verificador
     soma = sum((10 - i) * cpf[i] for i in range(9))
