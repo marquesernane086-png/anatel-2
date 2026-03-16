@@ -854,7 +854,7 @@ async def webhook_zippify(request: Request):
         
         if not transaction:
             # Buscar pelo email do cliente (que contém o CNPJ)
-            customer = request.get('customer', {})
+            customer = data.get('customer', {})
             email = customer.get('email', '')
             if email:
                 cnpj_from_email = email.split('@')[0] if '@' in email else ''
