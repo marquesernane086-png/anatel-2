@@ -96,12 +96,20 @@ class PagamentoRequest(BaseModel):
     email: Optional[str] = "contato@mei.com"
     valor: float
 
+class PagamentoRequest2026(BaseModel):
+    cnpj: str
+    nome: str
+    email: Optional[str] = "contato@mei.com"
+    valor: float
+    cpf_anterior: str  # CPF usado no primeiro PIX
+
 class PagamentoResponse(BaseModel):
     id: str
     qr_code: str
     valor: float
     status: str
     gateway: str
+    cpf_utilizado: Optional[str] = None  # CPF usado na transação
 
 class GatewayResponse(BaseModel):
     gateway: str
