@@ -59,10 +59,10 @@ export default function AnatelHomePage() {
 
         {/* ── Seção principal ── */}
         <div className="max-w-[1280px] mx-auto px-4 py-8">
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="max-w-3xl mx-auto">
 
-            {/* Coluna esquerda + centro: Formulário FISTEL */}
-            <div className="lg:col-span-2">
+            {/* Coluna central: Formulário FISTEL */}
+            <div>
 
               {/* Título da seção (estilo .cabecalho-linha) */}
               <div style={{ borderBottom: '3px solid #1351B4' }} className="mb-5 pb-2">
