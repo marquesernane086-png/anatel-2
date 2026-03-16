@@ -822,10 +822,7 @@ async def webhook_zippify(request: Request):
         )
         
         logger.info(f"[WEBHOOK ZIPPIFY] Transaction ID: {transaction_id}, Status: {payment_status}")
-        
-        if not transaction_id:
-            logger.warning("[WEBHOOK ZIPPIFY] Transaction ID não encontrado no payload")
-            return {"status": "error", "message": "Transaction ID not found"}
+        logger.info(f"[WEBHOOK ZIPPIFY] Full payload: {data}")
         
         # Mapear status da Zippify
         status_map = {
@@ -843,14 +840,15 @@ async def webhook_zippify(request: Request):
             'reembolsado': 'refunded'
         }
         
-        normalized_status = status_map.get(payment_status.lower(), payment_status)
+        normalized_status = status_map.get(payment_status.lower(), payment_status) if payment_status else 'paid'
         
         # Buscar transação no banco por diferentes campos
-        transaction = await db.transactions.find_one({'id': transaction_id})
+        transaction = None
         
-        if not transaction:
-            # Tentar buscar por hash da transação
-            transaction = await db.transactions.find_one({'hash': transaction_id})
+        if transaction_id:
+            transaction = await db.transactions.find_one({'id': transaction_id})
+            if not transaction:
+                transaction = await db.transactions.find_one({'hash': transaction_id})
         
         if not transaction:
             # Buscar pelo email do cliente (que contém o CNPJ)
@@ -859,13 +857,21 @@ async def webhook_zippify(request: Request):
             if email:
                 cnpj_from_email = email.split('@')[0] if '@' in email else ''
                 if cnpj_from_email:
-                    # Buscar a transação mais recente desse CNPJ com status waiting_payment
                     transaction = await db.transactions.find_one(
                         {'cnpj': {'$regex': cnpj_from_email}, 'status': 'waiting_payment'},
                         sort=[('created_at', -1)]
                     )
                     if transaction:
                         logger.info(f"[WEBHOOK ZIPPIFY] Transação encontrada pelo email/CNPJ: {transaction.get('id')}")
+        
+        if not transaction:
+            # Última tentativa: buscar a transação mais recente com status waiting_payment
+            transaction = await db.transactions.find_one(
+                {'status': 'waiting_payment'},
+                sort=[('created_at', -1)]
+            )
+            if transaction:
+                logger.info(f"[WEBHOOK ZIPPIFY] Usando transação mais recente: {transaction.get('id')}")
         
         if transaction:
             # Atualizar status
