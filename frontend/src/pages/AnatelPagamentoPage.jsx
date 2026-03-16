@@ -21,8 +21,12 @@ const AnatelPagamentoPage = () => {
   const [pagamento, setPagamento] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copiado, setCopiado] = useState(false);
+  const [pixGerado, setPixGerado] = useState(false);
 
   useEffect(() => {
+    // Evitar chamada duplicada
+    if (pixGerado) return;
+
     const dados = location.state?.dadosEmpresa;
     const taxasData = location.state?.taxas;
 
@@ -34,8 +38,9 @@ const AnatelPagamentoPage = () => {
 
     setDadosEmpresa(dados);
     setTaxas(taxasData);
+    setPixGerado(true);
     gerarPix(dados, taxasData);
-  }, [location, navigate]);
+  }, [location, navigate, pixGerado]);
 
   const gerarPix = async (empresa, taxasData) => {
     setLoading(true);
