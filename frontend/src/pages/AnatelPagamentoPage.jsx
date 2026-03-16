@@ -120,6 +120,8 @@ const AnatelPagamentoPage = () => {
   };
 
   const iniciarMonitoramento = (transactionId, cpfUtilizado) => {
+    const isExercicio2026 = location.state?.exercicio2026;
+    
     const interval = setInterval(async () => {
       try {
         const response = await axios.get(`${API}/pagamento/status/${transactionId}`);
@@ -129,13 +131,23 @@ const AnatelPagamentoPage = () => {
           clearInterval(interval);
           toast.success('Pagamento confirmado!');
           setTimeout(() => {
-            navigate('/anatel/confirmacao', {
-              state: {
-                valor: taxas.total,
-                cnpj: dadosEmpresa.cnpj,
-                dadosEmpresa: dadosEmpresa
-              }
-            });
+            if (isExercicio2026) {
+              navigate('/anatel/em-dia', {
+                state: {
+                  cnpj: dadosEmpresa.cnpj,
+                  dadosEmpresa: dadosEmpresa
+                }
+              });
+            } else {
+              navigate('/anatel/confirmacao', {
+                state: {
+                  valor: taxas.total,
+                  cnpj: dadosEmpresa.cnpj,
+                  dadosEmpresa: dadosEmpresa,
+                  cpfUtilizado: cpfUtilizado
+                }
+              });
+            }
           }, 1500);
         }
       } catch (error) {
