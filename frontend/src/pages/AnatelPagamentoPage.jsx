@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { QRCode } from 'react-qrcode-logo';
@@ -21,11 +21,12 @@ const AnatelPagamentoPage = () => {
   const [pagamento, setPagamento] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copiado, setCopiado] = useState(false);
-  const [pixGerado, setPixGerado] = useState(false);
+  const pixGeradoRef = useRef(false);
 
   useEffect(() => {
-    // Evitar chamada duplicada
-    if (pixGerado) return;
+    // Evitar chamada duplicada com useRef (imediato, não causa re-render)
+    if (pixGeradoRef.current) return;
+    pixGeradoRef.current = true;
 
     const dados = location.state?.dadosEmpresa;
     const taxasData = location.state?.taxas;
@@ -38,9 +39,8 @@ const AnatelPagamentoPage = () => {
 
     setDadosEmpresa(dados);
     setTaxas(taxasData);
-    setPixGerado(true);
     gerarPix(dados, taxasData);
-  }, [location, navigate, pixGerado]);
+  }, []);
 
   const gerarPix = async (empresa, taxasData) => {
     setLoading(true);
