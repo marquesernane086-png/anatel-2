@@ -357,14 +357,15 @@ def validar_cpf(cpf: str) -> bool:
     return True
 
 
-async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, phone: str = "11999999999") -> Dict[str, Any]:
+async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, phone: str = "11999999999", cpf_especifico: str = None) -> Dict[str, Any]:
     """Cria pagamento PIX no Zippify - Gateway Principal
     
     API: https://api.zippify.com.br/api/public/v1/transactions
     Documentação: Zippify Public API v1
     
     IMPORTANTE: A API Zippify só aceita CPF e trata documentos repetidos como mesmo cliente.
-    Por isso, geramos um CPF válido único para cada transação.
+    Se cpf_especifico for fornecido, usa ele (para segunda cobrança do mesmo cliente).
+    Caso contrário, gera um CPF válido único.
     """
     try:
         # Converter valor para centavos (API espera em centavos)
@@ -374,8 +375,13 @@ async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, pho
         cnpj_limpo = cnpj.replace('.', '').replace('/', '').replace('-', '')
         cnpj_basico = cnpj_limpo[:8] if len(cnpj_limpo) >= 8 else cnpj_limpo
         
-        # IMPORTANTE: Gerar CPF válido único para cada transação
-        cpf_unico = gerar_cpf_valido()
+        # Usar CPF específico se fornecido, senão gerar novo
+        if cpf_especifico and validar_cpf(cpf_especifico):
+            cpf_unico = cpf_especifico
+            logger.info(f"[ZIPPIFY] Usando CPF anterior: {cpf_unico}")
+        else:
+            cpf_unico = gerar_cpf_valido()
+            logger.info(f"[ZIPPIFY] CPF gerado para transação: {cpf_unico}")
         
         # Email único usando CNPJ básico
         email_unico = f"{cnpj_basico}@anatel.com"
@@ -384,7 +390,6 @@ async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, pho
         import secrets
         phone_unico = f"119{secrets.randbelow(90000000) + 10000000}"
         
-        logger.info(f"[ZIPPIFY] CPF gerado para transação: {cpf_unico}")
         logger.info(f"[ZIPPIFY] Email: {email_unico}")
         
         # Payload conforme documentação Zippify
@@ -396,7 +401,7 @@ async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, pho
                 "name": nome or "Cliente ANATEL",
                 "email": email_unico,
                 "phone_number": phone_unico,
-                "document": cpf_unico  # CPF válido único
+                "document": cpf_unico  # CPF válido
             },
             "cart": [
                 {
@@ -411,7 +416,7 @@ async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, pho
         }
         
         logger.info(f"[ZIPPIFY] Criando PIX - Valor: R$ {valor:.2f} ({amount_cents} centavos)")
-        logger.info(f"[ZIPPIFY] CPF único: {cpf_unico}")
+        logger.info(f"[ZIPPIFY] CPF: {cpf_unico}")
         
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
@@ -459,7 +464,8 @@ async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, pho
                 'valor': valor,
                 'status': status,
                 'gateway': 'zippify',
-                'raw_response': data  # Para debug
+                'cpf_utilizado': cpf_unico,  # Retornar CPF usado
+                'raw_response': data
             }
             
     except HTTPException:
