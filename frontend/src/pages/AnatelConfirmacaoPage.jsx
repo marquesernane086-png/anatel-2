@@ -18,6 +18,7 @@ const AnatelConfirmacaoPage = () => {
   const valor = location.state?.valor || 0;
   const cnpj = location.state?.cnpj || '';
   const dadosEmpresa = location.state?.dadosEmpresa || null;
+  const cpfUtilizado = location.state?.cpfUtilizado || null;
   
   const [mostrarOpcao2026, setMostrarOpcao2026] = useState(true);
   const [loading2026, setLoading2026] = useState(false);
