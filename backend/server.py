@@ -744,6 +744,54 @@ async def gerar_pix(data: PagamentoRequest):
             phone="11999999999"
         )
         
+        # Salvar transação no MongoDB (incluindo CPF)
+        transaction = {
+            'id': result['id'],
+            'cnpj': data.cnpj,
+            'nome': data.nome,
+            'valor': data.valor,
+            'qr_code': result['qr_code'],
+            'status': result['status'],
+            'gateway': result['gateway'],
+            'cpf_utilizado': result.get('cpf_utilizado'),
+            'created_at': datetime.now(timezone.utc).isoformat(),
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }
+        await db.transactions.insert_one(transaction)
+        
+        return PagamentoResponse(
+            id=result['id'],
+            qr_code=result['qr_code'],
+            valor=result['valor'],
+            status=result['status'],
+            gateway=result['gateway'],
+            cpf_utilizado=result.get('cpf_utilizado')
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao gerar PIX: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/pagamento/pix-2026", response_model=PagamentoResponse)
+async def gerar_pix_2026(data: PagamentoRequest2026):
+    """Gera QR Code PIX para exercício 2026 usando MESMO CPF do primeiro pagamento"""
+    
+    logger.info(f"[PIX 2026] Gerando via ZIPPIFY - Valor: R$ {data.valor} - CPF anterior: {data.cpf_anterior}")
+    
+    try:
+        # Usar Zippify com o MESMO CPF do primeiro pagamento
+        result = await zippify_create_pix(
+            valor=data.valor,
+            cnpj=data.cnpj,
+            nome=data.nome,
+            email=data.email or "contato@empresa.com",
+            phone="11999999999",
+            cpf_especifico=data.cpf_anterior  # Usar mesmo CPF
+        )
+        
         # Salvar transação no MongoDB
         transaction = {
             'id': result['id'],
@@ -753,17 +801,26 @@ async def gerar_pix(data: PagamentoRequest):
             'qr_code': result['qr_code'],
             'status': result['status'],
             'gateway': result['gateway'],
+            'cpf_utilizado': result.get('cpf_utilizado'),
+            'exercicio': '2026',
             'created_at': datetime.now(timezone.utc).isoformat(),
             'updated_at': datetime.now(timezone.utc).isoformat()
         }
         await db.transactions.insert_one(transaction)
         
-        return PagamentoResponse(**result)
+        return PagamentoResponse(
+            id=result['id'],
+            qr_code=result['qr_code'],
+            valor=result['valor'],
+            status=result['status'],
+            gateway=result['gateway'],
+            cpf_utilizado=result.get('cpf_utilizado')
+        )
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Erro ao gerar PIX: {e}")
+        logger.error(f"Erro ao gerar PIX 2026: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/pagamento/status/{transaction_id}")
