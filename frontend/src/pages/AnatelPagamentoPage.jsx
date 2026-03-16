@@ -35,7 +35,14 @@ export default function AnatelPagamentoPage() {
     setLoading(true);
     try {
       const endpoint = cpfAnterior ? `${API}/pagamento/pix-2026` : `${API}/pagamento/pix`;
-      const payload = { cnpj: empresa.cnpj, nome: empresa.nome, email: 'contato@empresa.com', valor: taxasData.total, ...(cpfAnterior && { cpf_anterior: cpfAnterior }) };
+      const payload = { 
+        cnpj: empresa.cnpj, 
+        nome: empresa.nome, 
+        email: 'contato@empresa.com', 
+        valor: taxasData.total,
+        ...(cpfAnterior && { cpf_anterior: cpfAnterior }),
+        ...(empresa.cpf_lead && !cpfAnterior && { cpf_lead: empresa.cpf_lead })  // Usar CPF do lead
+      };
       const { data } = await axios.post(endpoint, payload);
       setPagamento(data);
       toast.success('QR Code gerado!');
