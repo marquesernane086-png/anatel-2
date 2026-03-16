@@ -42,29 +42,6 @@ export default function AnatelHomePage() {
 
       <main className="flex-1">
 
-        {/* ── Bloco de botões estilo ANATEL (CONSUMIDOR / REGULADO / DADOS / LEGISLAÇÃO) ── */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-[1280px] mx-auto px-4 py-4">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: 'CONSUMIDOR', color: '#1351B4' },
-                { label: 'REGULADO', color: '#1351B4' },
-                { label: 'DADOS', color: '#1351B4' },
-                { label: 'FISCALIZAÇÃO', color: '#1351B4' },
-              ].map(btn => (
-                <a
-                  key={btn.label}
-                  href="#"
-                  className="flex items-center justify-center font-black text-white text-[13px] uppercase tracking-wide rounded py-3 px-2 hover:opacity-90 transition-opacity"
-                  style={{ background: btn.color }}
-                >
-                  {btn.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* ── Seção principal ── */}
         <div className="max-w-[1280px] mx-auto px-4 py-8">
           <div className="grid lg:grid-cols-3 gap-8">
