@@ -661,13 +661,8 @@ async def obter_taxas_anatel(cnpj: str):
 
     total_geral = round(total_geral, 2)
 
-    servicos = [
-        "SCM – Serviço de Comunicação Multimídia",
-        "SMP – Serviço Móvel Pessoal",
-        "STFC – Serviço Telefônico Fixo Comutado",
-        "SRD – Serviço de Radioamador",
-    ]
-    servico = servicos[seed % len(servicos)]
+    # Serviço fixo para linha telefônica móvel
+    servico = "SMP – Serviço Móvel Pessoal"
 
     return AnatelTaxasResponse(
         cnpj=cnpj,
