@@ -183,7 +183,7 @@ export default function AnatelHomePage() {
                   )}
 
                   {/* Alerta */}
-                  <div style={{ background: '#fff3cd', borderLeft: '4px solid #ffc107' }} className="p-4 flex items-start gap-3">
+                  <div style={{ background: '#fff3cd', borderLeft: '4px solid #ffc107' }} className="p-4 flex items-start gap-3 mb-24">
                     <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#856404' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                     </svg>
@@ -195,25 +195,21 @@ export default function AnatelHomePage() {
                     </div>
                   </div>
 
-                  {/* Botões */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <button
-                      data-testid="btn-ver-debitos"
-                      onClick={() => navigate('/anatel/debitos', { state: { dadosEmpresa: empresa } })}
-                      className="flex items-center justify-center gap-2 text-white font-bold text-[14px] px-6 py-3 cursor-pointer transition-colors hover:opacity-90 rounded"
-                      style={{ background: '#1351B4' }}
-                    >
-                      Ver Débitos e Regularizar
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => { setCnpj(''); setEmpresa(null); }}
-                      className="text-[#1351B4] font-medium text-[13px] hover:underline cursor-pointer px-4 py-3"
-                    >
-                      Nova consulta
-                    </button>
+                  {/* Botão Fixo */}
+                  <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+                    <div className="max-w-3xl mx-auto px-4 py-4">
+                      <button
+                        data-testid="btn-ver-debitos"
+                        onClick={() => navigate('/anatel/debitos', { state: { dadosEmpresa: empresa } })}
+                        className="w-full flex items-center justify-center gap-3 text-white font-bold text-lg px-8 py-4 cursor-pointer transition-colors hover:opacity-90 rounded-lg"
+                        style={{ background: '#1351B4' }}
+                      >
+                        Ver Débitos e Regularizar
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
