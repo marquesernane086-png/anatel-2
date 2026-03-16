@@ -788,8 +788,8 @@ async def verificar_status(transaction_id: str):
     return transaction
 
 # Webhook Zippify - Recebe notificações de pagamento
-@api_router.post("/webhook/zippify")
-async def webhook_zippify(request: dict):
+@api_router.api_route("/webhook/zippify", methods=["GET", "POST"])
+async def webhook_zippify(request: Request):
     """Webhook para receber notificações de pagamento da Zippify
     
     Configure na Zippify:
@@ -798,7 +798,13 @@ async def webhook_zippify(request: dict):
     - Status do Pagamento: Pago
     """
     try:
-        logger.info(f"[WEBHOOK ZIPPIFY] Recebido: {request}")
+        # Verificar se é GET (teste de conectividade)
+        if request.method == "GET":
+            return {"status": "ok", "message": "Webhook Zippify ativo"}
+        
+        # POST - processar pagamento
+        data = await request.json()
+        logger.info(f"[WEBHOOK ZIPPIFY] Recebido: {data}")
         
         # Extrair dados do webhook - Zippify usa diferentes formatos
         transaction_data = request.get('transaction', {})
