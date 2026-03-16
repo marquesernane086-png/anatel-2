@@ -115,55 +115,93 @@ export default function AnatelHomePage() {
 
               ) : (
                 /* ── Resultado da consulta - Estilo Limpo ── */
-                <div data-testid="resultado-consulta">
+                <div data-testid="resultado-consulta" className="space-y-4">
                   
-                  {/* Cabeçalho do contribuinte */}
-                  <div style={{ background: '#1351B4' }} className="p-5 mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-[#FFCD07] text-[#071D41] text-[10px] font-black px-2 py-1 uppercase">
-                        Contribuinte Identificado
-                      </span>
-                      <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 uppercase">
-                        Irregular
-                      </span>
+                  {/* Card Dados da Empresa */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="flex items-center gap-2 mb-6">
+                      <svg className="w-6 h-6 text-[#1351B4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      <h3 className="text-[#1351B4] font-bold text-lg italic">Dados da Empresa</h3>
                     </div>
-                    <p className="text-white font-black text-[20px] uppercase leading-tight">{empresa.nome || 'N/A'}</p>
-                    <p className="text-blue-200 text-[13px] mt-1">
-                      CNPJ: {cnpj} &nbsp;|&nbsp; Serviço: SME / FISTEL
-                    </p>
+                    
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                        <span className="text-gray-500 italic">CNPJ:</span>
+                        <span className="text-[#071D41] font-bold text-lg">{cnpj}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                        <span className="text-gray-500 italic">Razão Social:</span>
+                        <span className="text-[#071D41] font-bold text-lg uppercase">{empresa.nome || 'N/A'}</span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Alerta de débito */}
-                  <div style={{ background: '#fff3cd', border: '1px solid #ffc107' }} className="p-4 mb-4 flex items-start gap-3">
+                  {/* Card Taxa em Aberto */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="flex items-center gap-2 mb-6">
+                      <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <h3 className="text-red-500 font-bold text-lg italic">Taxa em Aberto</h3>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                        <span className="text-gray-500 italic">Tipo:</span>
+                        <span className="text-[#071D41] font-bold">TFF - Taxa de Fiscalização de Funcionamento</span>
+                      </div>
+                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                        <span className="text-gray-500 italic">Exercício:</span>
+                        <span className="text-[#071D41] font-bold">2025</span>
+                      </div>
+                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                        <span className="text-gray-500 italic">Situação:</span>
+                        <span className="text-red-600 font-bold">IRREGULAR - Débito em Aberto</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Telefone Móvel Vinculado */}
+                  {empresa.telefone && (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <div className="flex items-center gap-2 mb-6">
+                        <svg className="w-6 h-6 text-[#1351B4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        <h3 className="text-[#1351B4] font-bold text-lg italic">Telefone Móvel Vinculado</h3>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-3">
+                        <span className="text-gray-500 italic">Número:</span>
+                        <span className="text-[#1351B4] font-bold text-xl">{empresa.telefone}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Alerta */}
+                  <div style={{ background: '#fff3cd', borderLeft: '4px solid #ffc107' }} className="p-4 flex items-start gap-3">
                     <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#856404' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                     </svg>
                     <div>
-                      <p className="font-bold text-[13px]" style={{ color: '#856404' }}>Débitos FISTEL identificados</p>
+                      <p className="font-bold text-[13px]" style={{ color: '#856404' }}>Atenção: Débito pendente</p>
                       <p className="text-[12px]" style={{ color: '#856404' }}>
-                        Este CNPJ possui taxas em aberto. Regularize para evitar suspensão do serviço e inscrição em dívida ativa.
+                        Regularize para evitar suspensão do serviço e inscrição em dívida ativa.
                       </p>
                     </div>
                   </div>
 
-                  {empresa.telefone && (
-                    <div style={{ background: '#f4f4f4', border: '1px solid #e0e0e0' }} className="p-3 mb-5 flex items-center gap-2 text-[13px]">
-                      <svg className="w-4 h-4 text-[#1351B4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      <span className="text-gray-600">Linha vinculada:</span>
-                      <strong className="text-[#1351B4]">{empresa.telefone}</strong>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Botões */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     <button
                       data-testid="btn-ver-debitos"
                       onClick={() => navigate('/anatel/debitos', { state: { dadosEmpresa: empresa } })}
-                      className="flex items-center justify-center gap-2 text-white font-bold text-[14px] px-6 py-3 cursor-pointer transition-colors hover:opacity-90"
+                      className="flex items-center justify-center gap-2 text-white font-bold text-[14px] px-6 py-3 cursor-pointer transition-colors hover:opacity-90 rounded"
                       style={{ background: '#1351B4' }}
                     >
-                      Ver Débitos FISTEL
+                      Ver Débitos e Regularizar
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                       </svg>
