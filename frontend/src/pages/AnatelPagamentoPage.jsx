@@ -298,7 +298,7 @@ export default function AnatelPagamentoPage() {
                   </div>
                   <div style={{ border: '1px solid #e0e0e0', borderTop: 'none' }} className="bg-white">
                     {[
-                      { label: 'Empresa', val: dadosEmpresa.nome?.substring(0, 30) + (dadosEmpresa.nome?.length > 30 ? '...' : '') },
+                      { label: 'Razão Social', val: dadosEmpresa.nome?.substring(0, 30) + (dadosEmpresa.nome?.length > 30 ? '...' : '') },
                       { label: 'Taxa', val: `TFF ${is2026 ? '2026' : '2025'}` },
                       { label: 'Valor', val: fmt(taxas?.total), bold: true },
                     ].map(r => (
