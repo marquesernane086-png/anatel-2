@@ -8,6 +8,7 @@ import AnatelHomePage from './pages/AnatelHomePage';
 import AnatelDebitosPage from './pages/AnatelDebitosPage';
 import AnatelPagamentoPage from './pages/AnatelPagamentoPage';
 import AnatelConfirmacaoPage from './pages/AnatelConfirmacaoPage';
+import AnatelEmDiaPage from './pages/AnatelEmDiaPage';
 import './App.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/anatel/debitos" element={<AnatelDebitosPage />} />
           <Route path="/anatel/pagamento" element={<AnatelPagamentoPage />} />
           <Route path="/anatel/confirmacao" element={<AnatelConfirmacaoPage />} />
+          <Route path="/anatel/em-dia" element={<AnatelEmDiaPage />} />
           
           {/* Admin */}
           <Route path="/login" element={<LoginPage />} />
