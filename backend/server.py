@@ -739,15 +739,52 @@ async def gerar_pix_2026(data: PagamentoRequest2026):
 
 @api_router.get("/pagamento/status/{transaction_id}")
 async def verificar_status(transaction_id: str):
-    """Verifica status do pagamento"""
+    """Verifica status do pagamento consultando a API Zippify"""
     # Buscar no banco
     transaction = await db.transactions.find_one({'id': transaction_id}, {'_id': 0})
     
     if not transaction:
         raise HTTPException(status_code=404, detail="Transação não encontrada")
     
-    # Para Zippify, o status é atualizado via webhook ou simulação
-    # Retorna o status atual do banco
+    # Consultar status na API Zippify
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(
+                f"{ZIPPIFY_BASE_URL}/transactions/{transaction_id}",
+                params={"api_token": ZIPPIFY_API_TOKEN},
+                headers={"Accept": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                new_status = data.get('payment_status') or data.get('status') or transaction['status']
+                
+                # Mapear status da Zippify para nosso padrão
+                status_map = {
+                    'paid': 'paid',
+                    'approved': 'paid',
+                    'confirmed': 'paid',
+                    'waiting_payment': 'waiting_payment',
+                    'pending': 'waiting_payment',
+                    'expired': 'expired',
+                    'cancelled': 'cancelled',
+                    'refunded': 'refunded'
+                }
+                normalized_status = status_map.get(new_status.lower(), new_status)
+                
+                # Atualizar no banco se status mudou
+                if normalized_status != transaction.get('status'):
+                    await db.transactions.update_one(
+                        {'id': transaction_id},
+                        {'$set': {'status': normalized_status, 'updated_at': datetime.now(timezone.utc).isoformat()}}
+                    )
+                    transaction['status'] = normalized_status
+                    logger.info(f"[ZIPPIFY] Status atualizado: {transaction_id} -> {normalized_status}")
+            else:
+                logger.warning(f"[ZIPPIFY] Erro ao consultar status: {response.status_code}")
+    except Exception as e:
+        logger.warning(f"[ZIPPIFY] Erro ao consultar status: {e}")
+    
     return transaction
 
 # Endpoint de simulação para testes (REMOVER EM PRODUÇÃO)
