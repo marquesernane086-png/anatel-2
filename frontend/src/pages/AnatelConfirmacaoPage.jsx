@@ -132,19 +132,19 @@ export default function AnatelConfirmacaoPage() {
               {/* Oferta TFF 2026 */}
               {mostrar2026 && (
                 <div>
-                  <div style={{ background: '#1351B4' }} className="px-4 py-3 flex items-center gap-2">
+                  <div style={{ background: '#071D41' }} className="px-4 py-3 flex items-center gap-2">
                     <svg className="w-4 h-4" style={{ color: '#FFCD07' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <h3 className="text-white font-bold text-[13px] uppercase tracking-wider">TFF 2026</h3>
                   </div>
-                  <div style={{ border: '2px solid #1351B4', borderTop: 'none' }} className="bg-white p-5">
+                  <div style={{ border: '2px solid #071D41', borderTop: 'none' }} className="bg-white p-5">
                     <p className="text-[13px] text-gray-600 mb-4 leading-relaxed">
                       Mantenha sua empresa regularizada com o pagamento do exercício 2026 sem multas ou acréscimos.
                     </p>
                     <div style={{ background: '#f0f5ff', border: '1px solid #c7d9f5' }} className="p-4 text-center mb-4">
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Valor 2026</p>
-                      <p className="font-black text-[30px] text-[#1351B4]">{fmt(valorTFF2026)}</p>
+                      <p className="font-black text-[30px] text-[#071D41]">{fmt(valorTFF2026)}</p>
                     </div>
                     <button
                       data-testid="btn-pagar-2026"
