@@ -661,8 +661,8 @@ async def obter_taxas_anatel(cnpj: str):
 
     total_geral = round(total_geral, 2)
 
-    # Serviço fixo para linha telefônica móvel
-    servico = "SMP – Serviço Móvel Pessoal"
+    # Serviço fixo para linha telefônica móvel empresarial
+    servico = "SME – Serviço Móvel Empresarial"
 
     return AnatelTaxasResponse(
         cnpj=cnpj,
