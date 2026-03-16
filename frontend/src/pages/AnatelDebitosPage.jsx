@@ -47,11 +47,18 @@ export default function AnatelDebitosPage() {
     <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Rawline','Segoe UI',system-ui,sans-serif" }}>
       <AnatelHeader breadcrumb="Débitos FISTEL" />
 
-      {/* Banner título — estilo .topo-com-degrade do ANATEL */}
-      <div style={{ background: 'linear-gradient(90deg,#071D41 0%,#1351B4 100%)' }} className="py-6 px-4">
-        <div className="max-w-[1280px] mx-auto">
-          <p style={{ color: '#FFCD07' }} className="text-[11px] font-bold uppercase tracking-widest mb-1">FISTEL Online</p>
-          <h1 className="text-white font-black text-[24px]">Débitos FISTEL — Taxa de Funcionamento</h1>
+      {/* Hero com Logo ANATEL */}
+      <div style={{ background: '#071D41' }} className="py-6 px-4">
+        <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row items-center justify-center gap-6">
+          <img 
+            src="https://customer-assets.emergentagent.com/job_lead-conversion-9/artifacts/ktf9iqob_pngwing.com.png"
+            alt="ANATEL"
+            className="w-24 md:w-32 h-auto"
+          />
+          <div className="text-center md:text-left">
+            <p style={{ color: '#FFCD07' }} className="text-[11px] font-bold uppercase tracking-widest mb-1">FISTEL Online</p>
+            <h1 className="text-white font-bold text-xl md:text-2xl">Débitos FISTEL — Taxa de Funcionamento</h1>
+          </div>
         </div>
       </div>
 
