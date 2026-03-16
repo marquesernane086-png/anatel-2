@@ -192,32 +192,6 @@ export default function AnatelHomePage() {
             </aside>
           </div>
         </div>
-
-        {/* ── Faixa de destaques (little-cards) — estilo ANATEL ── */}
-        <div style={{ background: '#f4f4f4', borderTop: '1px solid #e0e0e0', borderBottom: '1px solid #e0e0e0' }}>
-          <div className="max-w-[1280px] mx-auto px-4 py-6">
-            <p className="text-[#1351B4] font-black text-[14px] uppercase tracking-wider mb-4">Acesso Rápido</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-              {[
-                'Canais de Atendimento',
-                'Imprensa',
-                'Processo Eletrônico (SEI)',
-                'Acesso à Informação',
-                'Licitações e Contratos',
-                'Ouvidoria',
-              ].map(item => (
-                <a
-                  key={item}
-                  href="#"
-                  className="flex items-center justify-center text-center text-white font-bold text-[12px] px-3 py-4 hover:bg-[#0c3d91] transition-colors"
-                  style={{ background: '#1351B4', minHeight: 60 }}
-                >
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
       </main>
 
       <AnatelFooter />
