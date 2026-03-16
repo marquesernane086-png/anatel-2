@@ -164,7 +164,7 @@ export default function AnatelDebitosPage() {
             data-testid="btn-regularizar"
             onClick={() => navigate('/anatel/pagamento', { state: { dadosEmpresa: empresa, taxas } })}
             className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-white font-black text-[15px] px-8 py-3.5 cursor-pointer hover:opacity-90 transition-opacity"
-            style={{ background: '#1351B4' }}
+            style={{ background: '#00A859' }}
           >
             Regularizar Débito
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
