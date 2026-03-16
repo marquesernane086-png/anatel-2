@@ -385,8 +385,12 @@ async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, pho
             cpf_unico = gerar_cpf_valido()
             logger.info(f"[ZIPPIFY] CPF gerado para transação: {cpf_unico}")
         
-        # Email único usando CNPJ básico
-        email_unico = f"{cnpj_basico}@anatel.com"
+        # Email único usando CNPJ básico (garantir que nunca seja vazio)
+        if cnpj_basico:
+            email_unico = f"{cnpj_basico}@anatel.com"
+        else:
+            import secrets
+            email_unico = f"cliente{secrets.randbelow(999999)}@anatel.com"
         
         # Gerar telefone único
         import secrets
