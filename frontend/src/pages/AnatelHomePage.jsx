@@ -130,7 +130,7 @@ export default function AnatelHomePage() {
                         </div>
                         <div className="flex justify-between items-start py-2 border-b border-gray-100">
                           <span className="text-gray-600 text-sm uppercase">Razão Social</span>
-                          <span className="text-[#071D41] font-semibold text-right max-w-[60%]">{empresa.nome || 'N/A'}</span>
+                          <span className="text-[#071D41] font-semibold text-right max-w-[60%]">{empresa.nome?.replace(/\s*\d{11,}$/, '') || 'N/A'}</span>
                         </div>
                         <div className="flex justify-between items-start py-2 border-b border-gray-100">
                           <span className="text-gray-600 text-sm uppercase">Serviço</span>
