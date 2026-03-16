@@ -118,75 +118,69 @@ export default function AnatelHomePage() {
                 <div data-testid="resultado-consulta" className="space-y-4">
                   
                   {/* Card Dados do Contribuinte */}
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                      <svg className="w-6 h-6 text-[#1351B4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                      <h3 className="text-[#1351B4] font-bold text-lg italic">Dados do Contribuinte</h3>
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="bg-[#1351B4] px-5 py-3">
+                      <h3 className="text-white font-semibold text-sm uppercase tracking-wide">Dados do Contribuinte</h3>
                     </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                        <span className="text-gray-500 italic">CNPJ:</span>
-                        <span className="text-[#071D41] font-bold text-lg">{cnpj}</span>
-                      </div>
-                      <div className="flex justify-between items-start py-3 border-b border-gray-100">
-                        <span className="text-gray-500 italic">Razão Social:</span>
-                        <span className="text-[#071D41] font-bold text-lg uppercase text-right max-w-[60%]">{empresa.nome || 'N/A'}</span>
-                      </div>
-                      <div className="flex justify-between items-start py-3 border-b border-gray-100">
-                        <span className="text-gray-500 italic">Serviço:</span>
-                        <span className="text-[#071D41] font-bold text-right">STMC - Serviço Telefônico Móvel Comutado</span>
-                      </div>
-                      <div className="flex justify-between items-center py-3">
-                        <span className="text-gray-500 italic">Nº Estações:</span>
-                        <span className="text-[#071D41] font-bold">1</span>
+                    <div className="p-5">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                          <span className="text-gray-600 text-sm">CNPJ</span>
+                          <span className="text-[#071D41] font-semibold">{cnpj}</span>
+                        </div>
+                        <div className="flex justify-between items-start py-2 border-b border-gray-100">
+                          <span className="text-gray-600 text-sm">Razão Social</span>
+                          <span className="text-[#071D41] font-semibold text-right max-w-[60%]">{empresa.nome || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between items-start py-2 border-b border-gray-100">
+                          <span className="text-gray-600 text-sm">Serviço</span>
+                          <span className="text-[#071D41] font-semibold text-right">STMC - Serviço Telefônico Móvel Comutado</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2">
+                          <span className="text-gray-600 text-sm">Nº Estações</span>
+                          <span className="text-[#071D41] font-semibold">1</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Card Taxa em Aberto */}
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                      <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <h3 className="text-red-500 font-bold text-lg italic">Taxa em Aberto</h3>
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="bg-red-600 px-5 py-3">
+                      <h3 className="text-white font-semibold text-sm uppercase tracking-wide">Taxa em Aberto</h3>
                     </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                        <span className="text-gray-500 italic">Tipo:</span>
-                        <span className="text-[#071D41] font-bold">TFF - Taxa de Fiscalização de Funcionamento</span>
-                      </div>
-                      <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                        <span className="text-gray-500 italic">Exercício:</span>
-                        <span className="text-[#071D41] font-bold">2025</span>
-                      </div>
-                      <div className="flex justify-between items-center py-3">
-                        <span className="text-gray-500 italic">Situação:</span>
-                        <span className="text-red-600 font-bold">IRREGULAR - Débito em Aberto</span>
+                    <div className="p-5">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                          <span className="text-gray-600 text-sm">Tipo</span>
+                          <span className="text-[#071D41] font-semibold">TFF - Taxa de Fiscalização de Funcionamento</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                          <span className="text-gray-600 text-sm">Exercício</span>
+                          <span className="text-[#071D41] font-semibold">2025</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2">
+                          <span className="text-gray-600 text-sm">Situação</span>
+                          <span className="text-red-600 font-bold">IRREGULAR - Débito em Aberto</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Card Telefone Móvel Vinculado */}
                   {empresa.telefone && (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                      <div className="flex items-center gap-2 mb-6">
-                        <svg className="w-6 h-6 text-[#1351B4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                        <h3 className="text-[#1351B4] font-bold text-lg italic">Telefone Móvel Vinculado</h3>
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                      <div className="bg-[#1351B4] px-5 py-3">
+                        <h3 className="text-white font-semibold text-sm uppercase tracking-wide">Telefone Móvel Vinculado</h3>
                       </div>
-                      
-                      <div className="flex justify-between items-center py-3">
-                        <span className="text-gray-500 italic">Número:</span>
-                        <span className="text-[#1351B4] font-bold text-xl">{empresa.telefone}</span>
+                      <div className="p-5">
+                        <div className="flex justify-between items-center py-2">
+                          <span className="text-gray-600 text-sm">Número</span>
+                          <span className="text-[#1351B4] font-bold text-lg">{empresa.telefone}</span>
+                        </div>
                       </div>
                     </div>
-                  )}
+                  )}}
 
                   {/* Alerta */}
                   <div style={{ background: '#fff3cd', borderLeft: '4px solid #ffc107' }} className="p-4 flex items-start gap-3">
