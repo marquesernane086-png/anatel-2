@@ -180,7 +180,7 @@ export default function AnatelHomePage() {
                         </div>
                       </div>
                     </div>
-                  )}}
+                  )}
 
                   {/* Alerta */}
                   <div style={{ background: '#fff3cd', borderLeft: '4px solid #ffc107' }} className="p-4 flex items-start gap-3">
