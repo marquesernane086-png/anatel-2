@@ -807,17 +807,17 @@ async def webhook_zippify(request: Request):
         logger.info(f"[WEBHOOK ZIPPIFY] Recebido: {data}")
         
         # Extrair dados do webhook - Zippify usa diferentes formatos
-        transaction_data = request.get('transaction', {})
+        transaction_data = data.get('transaction', {})
         transaction_id = str(
-            request.get('id') or 
+            data.get('id') or 
             transaction_data.get('id') or 
-            request.get('transaction_id') or 
-            request.get('hash', '')
+            data.get('transaction_id') or 
+            data.get('hash', '')
         )
         
         payment_status = (
-            request.get('status') or 
-            request.get('payment_status') or 
+            data.get('status') or 
+            data.get('payment_status') or 
             transaction_data.get('status', '')
         )
         
