@@ -399,32 +399,29 @@ const AnatelDebitosPage = () => {
                   <span className="text-sm font-bold text-green-700">PIX</span>
                   <span className="text-xs text-green-600">Instantâneo</span>
                 </div>
-                <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2">
-                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span className="text-sm font-bold text-gray-700">GRU</span>
-                  <span className="text-xs text-gray-500">Guia de Recolhimento</span>
-                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Botão Regularizar */}
-          <Button
-            onClick={irParaPagamento}
-            className="w-full text-white font-bold py-6 text-lg shadow-lg transition-all hover:opacity-90 cursor-pointer"
-            style={{ backgroundColor: '#003580' }}
-          >
-            <span className="flex items-center gap-2">
-              <CheckCircle2 className="w-6 h-6" />
-              Regularizar Taxa FISTEL agora
-            </span>
-          </Button>
+          {/* Espaço para o botão fixo não sobrepor conteúdo */}
+          <div className="h-24 md:h-0"></div>
 
-          <p className="text-center text-xs text-gray-500 mt-3">
-            Você será direcionado ao sistema de pagamento seguro da Anatel via PIX
-          </p>
+          {/* Botão Regularizar - Fixo no mobile */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg md:relative md:border-0 md:shadow-none md:p-0 md:bg-transparent z-50">
+            <Button
+              onClick={irParaPagamento}
+              className="w-full text-white font-bold py-5 text-lg shadow-lg transition-all hover:opacity-90 cursor-pointer"
+              style={{ backgroundColor: '#003580' }}
+            >
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="w-6 h-6" />
+                Regularizar Taxa FISTEL agora
+              </span>
+            </Button>
+            <p className="text-center text-xs text-gray-500 mt-2 hidden md:block">
+              Você será direcionado ao sistema de pagamento seguro da Anatel via PIX
+            </p>
+          </div>
         </div>
       </main>
 
