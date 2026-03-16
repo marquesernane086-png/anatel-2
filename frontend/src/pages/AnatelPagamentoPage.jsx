@@ -84,10 +84,39 @@ export default function AnatelPagamentoPage() {
 
   const copiar = () => {
     if (pagamento?.qr_code) {
-      navigator.clipboard.writeText(pagamento.qr_code);
-      setCopiado(true);
-      toast.success('Código copiado!');
-      setTimeout(() => setCopiado(false), 3000);
+      // Fallback para navegadores que bloqueiam Clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = pagamento.qr_code;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        setCopiado(true);
+        toast.success('Código copiado!');
+        setTimeout(() => setCopiado(false), 3000);
+      } catch (err) {
+        // Tentar Clipboard API como fallback
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(pagamento.qr_code)
+            .then(() => {
+              setCopiado(true);
+              toast.success('Código copiado!');
+              setTimeout(() => setCopiado(false), 3000);
+            })
+            .catch(() => {
+              toast.error('Não foi possível copiar. Selecione e copie manualmente.');
+            });
+        } else {
+          toast.error('Não foi possível copiar. Selecione e copie manualmente.');
+        }
+      }
+      
+      document.body.removeChild(textArea);
     }
   };
 
