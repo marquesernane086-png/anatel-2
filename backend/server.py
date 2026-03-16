@@ -30,12 +30,6 @@ db = client[os.environ['DB_NAME']]
 
 # Gateway Configuration
 GATEWAY_FILE = Path('/app/.gateway')
-FURIAPAY_BASE_URL = os.getenv('FURIAPAY_BASE_URL', 'https://api.furiapaybr.com/v1')
-FURIAPAY_PUBLIC_KEY = os.getenv('FURIAPAY_PUBLIC_KEY', '')
-FURIAPAY_SECRET_KEY = os.getenv('FURIAPAY_SECRET_KEY', '')
-PAGLOOP_BASE_URL = os.getenv('PAGLOOP_BASE_URL', 'https://api.pagloop.tech')
-PAGLOOP_CLIENT_ID = os.getenv('PAGLOOP_CLIENT_ID', '')
-PAGLOOP_CLIENT_SECRET = os.getenv('PAGLOOP_CLIENT_SECRET', '')
 
 # Zippify API Configuration (Gateway Principal)
 ZIPPIFY_BASE_URL = os.getenv('ZIPPIFY_BASE_URL', 'https://api.zippify.com.br/api/public/v1')
