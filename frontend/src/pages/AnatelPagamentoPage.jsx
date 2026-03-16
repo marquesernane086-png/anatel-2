@@ -55,22 +55,6 @@ export default function AnatelPagamentoPage() {
     }
   };
 
-  const simularAprovacao = async () => {
-    if (!pagamento?.id) return;
-    try {
-      await axios.post(`${API}/pagamento/simular-aprovacao/${pagamento.id}`);
-      toast.success('Pagamento aprovado!');
-      const is2026 = stateRef.current?.exercicio2026;
-      setTimeout(() => {
-        if (is2026) {
-          navigate('/anatel/em-dia', { state: { cnpj: dadosEmpresa?.cnpj, dadosEmpresa } });
-        } else {
-          navigate('/anatel/confirmacao', { state: { valor: taxas?.total, cnpj: dadosEmpresa?.cnpj, dadosEmpresa, cpfUtilizado: pagamento?.cpf_utilizado } });
-        }
-      }, 800);
-    } catch { toast.error('Erro ao simular'); }
-  };
-
   const iniciarMonitoramento = (id, cpfUtilizado) => {
     const is2026 = stateRef.current?.exercicio2026;
     const interval = setInterval(async () => {
