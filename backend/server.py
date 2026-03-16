@@ -746,50 +746,8 @@ async def verificar_status(transaction_id: str):
     if not transaction:
         raise HTTPException(status_code=404, detail="Transação não encontrada")
     
-    gateway = transaction.get('gateway', 'pagloop')
-    
-    # Consultar gateway para atualizar status
-    try:
-        if gateway == 'pagloop':
-            # PagLoop status endpoint
-            token = await pagloop_authenticate()
-            async with httpx.AsyncClient(timeout=15.0) as client:
-                response = await client.get(
-                    f"{PAGLOOP_BASE_URL}/api/transactions/getStatusTransac/{transaction_id}",
-                    headers={"Authorization": f"Bearer {token}"}
-                )
-                if response.status_code == 200:
-                    data = response.json()
-                    new_status = data.get('status', transaction['status'])
-                    
-                    # Atualizar no banco
-                    await db.transactions.update_one(
-                        {'id': transaction_id},
-                        {'$set': {'status': new_status, 'updated_at': datetime.now(timezone.utc).isoformat()}}
-                    )
-                    transaction['status'] = new_status
-        else:
-            # FuriaPay status endpoint
-            credentials = f"{FURIAPAY_PUBLIC_KEY}:{FURIAPAY_SECRET_KEY}"
-            auth_header = 'Basic ' + base64.b64encode(credentials.encode()).decode()
-            
-            async with httpx.AsyncClient(timeout=15.0) as client:
-                response = await client.get(
-                    f"{FURIAPAY_BASE_URL}/transactions/{transaction_id}",
-                    headers={"Authorization": auth_header}
-                )
-                if response.status_code == 200:
-                    data = response.json()
-                    new_status = data.get('status', transaction['status'])
-                    
-                    await db.transactions.update_one(
-                        {'id': transaction_id},
-                        {'$set': {'status': new_status, 'updated_at': datetime.now(timezone.utc).isoformat()}}
-                    )
-                    transaction['status'] = new_status
-    except Exception as e:
-        logger.warning(f"Erro ao atualizar status: {e}")
-    
+    # Para Zippify, o status é atualizado via webhook ou simulação
+    # Retorna o status atual do banco
     return transaction
 
 # Endpoint de simulação para testes (REMOVER EM PRODUÇÃO)
