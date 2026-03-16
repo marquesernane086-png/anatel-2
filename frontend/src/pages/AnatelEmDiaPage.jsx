@@ -20,7 +20,7 @@ export default function AnatelEmDiaPage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Rawline','Segoe UI',system-ui,sans-serif" }}>
+    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Open Sans','Segoe UI',system-ui,sans-serif" }}>
       <AnatelHeader breadcrumb="Situação Fiscal Regular" />
 
       {/* Hero com Logo ANATEL - Em Dia */}

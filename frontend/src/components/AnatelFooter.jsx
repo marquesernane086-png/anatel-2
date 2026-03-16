@@ -1,7 +1,7 @@
 import React from 'react';
 
 const AnatelFooter = () => (
-  <footer style={{ fontFamily: "'Rawline', 'Segoe UI', system-ui, sans-serif" }}>
+  <footer style={{ fontFamily: "'Open Sans', 'Segoe UI', system-ui, sans-serif" }}>
     {/* Corpo azul escuro */}
     <div style={{ background: '#071D41' }} className="pt-10 pb-6">
       <div className="max-w-[1280px] mx-auto px-4">

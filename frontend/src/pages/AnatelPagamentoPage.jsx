@@ -123,7 +123,7 @@ export default function AnatelPagamentoPage() {
   const is2026 = stateRef.current?.exercicio2026;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Rawline','Segoe UI',system-ui,sans-serif" }}>
+    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Open Sans','Segoe UI',system-ui,sans-serif" }}>
       <AnatelHeader breadcrumb={`Pagamento PIX — TFF ${is2026 ? '2026' : '2025'}`} />
 
       {/* Hero com Logo ANATEL */}

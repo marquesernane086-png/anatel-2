@@ -37,7 +37,7 @@ export default function AnatelHomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Rawline', 'Segoe UI', system-ui, sans-serif" }}>
+    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Open Sans', 'Segoe UI', system-ui, sans-serif" }}>
       <AnatelHeader breadcrumb="Consulta FISTEL" />
 
       <main className="flex-1">

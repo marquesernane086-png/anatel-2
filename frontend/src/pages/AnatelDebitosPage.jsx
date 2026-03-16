@@ -31,7 +31,7 @@ export default function AnatelDebitosPage() {
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Rawline','Segoe UI',system-ui,sans-serif" }}>
+    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Open Sans','Segoe UI',system-ui,sans-serif" }}>
       <AnatelHeader breadcrumb="Débitos FISTEL" />
       <main className="flex-1 flex items-center justify-center">
         <div className="text-center">
@@ -44,7 +44,7 @@ export default function AnatelDebitosPage() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Rawline','Segoe UI',system-ui,sans-serif" }}>
+    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: "'Open Sans','Segoe UI',system-ui,sans-serif" }}>
       <AnatelHeader breadcrumb="Débitos FISTEL" />
 
       {/* Hero com Logo ANATEL */}

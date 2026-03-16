@@ -5,7 +5,7 @@ const AnatelHeader = ({ breadcrumb = null }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header style={{ fontFamily: "'Rawline','Segoe UI',system-ui,sans-serif", background: '#fff' }}>
+    <header style={{ fontFamily: "'Open Sans','Segoe UI',system-ui,sans-serif", background: '#fff' }}>
 
       {/* ══════════════════════════════════════════════════
           LINHA 1 — gov.br logo + Ministério + links inst.
