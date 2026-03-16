@@ -64,91 +64,85 @@ export default function AnatelDebitosPage() {
 
       <main className="flex-1 py-8 pb-32">
         <div className="max-w-[900px] mx-auto px-4">
-          <div className="space-y-5">
+          <div className="space-y-4">
 
-            {/* Coluna principal */}
-            <div className="space-y-5">
-
-              {/* Dados do Contribuinte */}
-              <div>
-                <div style={{ borderBottom: '3px solid #1351B4' }} className="mb-0">
-                  <div style={{ background: '#1351B4' }} className="px-5 py-3">
-                    <h2 className="text-white font-bold text-[13px] uppercase tracking-wider">Dados do Contribuinte</h2>
+            {/* Card Dados do Contribuinte */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-[#1351B4] px-5 py-3">
+                <h3 className="text-white font-semibold text-sm uppercase tracking-wide">Dados do Contribuinte</h3>
+              </div>
+              <div className="p-5">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start py-2 border-b border-gray-100">
+                    <span className="text-gray-600 text-sm uppercase">Razão Social</span>
+                    <span className="text-[#071D41] font-semibold text-right max-w-[60%]">{empresa?.nome || 'N/A'}</span>
                   </div>
-                </div>
-                <div style={{ border: '1px solid #e0e0e0', borderTop: 'none' }} className="p-5 bg-white">
-                  <p className="font-black text-[#071D41] text-[18px] uppercase mb-4">{empresa?.nome || 'N/A'}</p>
-                  <div className="grid sm:grid-cols-3 gap-3 mb-3">
-                    {[
-                      { label: 'CNPJ', val: fmtCNPJ(empresa?.cnpj) },
-                      { label: 'Serviço', val: 'SME' },
-                      { label: 'Situação', val: 'IRREGULAR', red: true },
-                    ].map(f => (
-                      <div key={f.label} style={{ background: '#f4f4f4', border: '1px solid #e0e0e0' }} className="p-3">
-                        <p className="text-[10px] text-gray-500 uppercase tracking-wide mb-0.5">{f.label}</p>
-                        <p className={`font-bold text-[13px] ${f.red ? 'text-red-600' : 'text-[#071D41]'}`}>{f.val}</p>
-                      </div>
-                    ))}
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600 text-sm uppercase">CNPJ</span>
+                    <span className="text-[#071D41] font-semibold">{fmtCNPJ(empresa?.cnpj)}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600 text-sm uppercase">Serviço</span>
+                    <span className="text-[#071D41] font-semibold">STMC - Serviço Telefônico Móvel Comutado</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600 text-sm uppercase">Situação</span>
+                    <span className="text-red-600 font-bold">IRREGULAR</span>
                   </div>
                   {empresa?.telefone && (
-                    <div style={{ background: '#fff8e1', border: '1px solid #ffc107' }} className="flex items-center gap-2 p-3 text-[12px]">
-                      <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#856404' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      <span style={{ color: '#856404' }}>Linha vinculada: <strong>{empresa.telefone}</strong></span>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600 text-sm uppercase">Telefone Vinculado</span>
+                      <span className="text-[#1351B4] font-bold">{empresa.telefone}</span>
                     </div>
                   )}
                 </div>
               </div>
+            </div>
 
-              {/* Débitos */}
-              <div>
-                <div style={{ background: '#dc3545' }} className="px-5 py-3">
-                  <h2 className="text-white font-bold text-[13px] uppercase tracking-wider flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                    </svg>
-                    Débito em Aberto — Ação Necessária
-                  </h2>
-                </div>
-                <div style={{ border: '2px solid #dc3545', borderTop: 'none' }} className="bg-white">
-                  {/* Valor total destaque */}
-                  <div style={{ background: '#fff5f5', borderBottom: '1px solid #f5c6cb' }} className="p-5 text-center">
-                    <p className="text-[11px] text-gray-500 uppercase tracking-widest mb-1">Valor Total a Regularizar</p>
-                    <p className="font-black text-[38px] text-red-600" data-testid="valor-total">
-                      {fmt(taxas?.total)}
-                    </p>
+            {/* Card Taxa em Aberto */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-red-600 px-5 py-3">
+                <h3 className="text-white font-semibold text-sm uppercase tracking-wide">Taxa em Aberto</h3>
+              </div>
+              <div className="p-5">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600 text-sm uppercase">Tipo</span>
+                    <span className="text-[#071D41] font-semibold">TFF - Taxa de Fiscalização de Funcionamento</span>
                   </div>
-
-                  {/* Detalhamento */}
-                  <div className="p-5">
-                    {taxas?.taxas?.map((taxa, i) => (
-                      <div key={i} style={{ border: '1px solid #e0e0e0' }} className="mb-3 last:mb-0">
-                        <div style={{ background: '#f4f4f4', borderBottom: '1px solid #e0e0e0' }} className="px-4 py-2">
-                          <p className="text-[11px] font-bold text-[#071D41] uppercase tracking-wider">{taxa.tipo}</p>
-                        </div>
-                        <div className="px-4 py-3">
-                          <table className="w-full">
-                            <tbody>
-                              {[
-                                { k: 'Período', v: taxa.periodo },
-                                { k: 'Principal', v: fmt(taxa.principal) },
-                                { k: 'Multa e acréscimos', v: `+ ${fmt(taxa.acrescimos)}`, red: true },
-                              ].map(row => (
-                                <tr key={row.k} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                  <td className="py-2 text-[12px] text-gray-500">{row.k}</td>
-                                  <td className={`py-2 text-[13px] font-bold text-right ${row.red ? 'text-red-600' : 'text-[#071D41]'}`}>{row.v}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600 text-sm uppercase">Exercício</span>
+                    <span className="text-[#071D41] font-semibold">2025</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600 text-sm uppercase">Principal</span>
+                    <span className="text-[#071D41] font-semibold">{fmt(taxas?.taxas?.[0]?.principal || 57.38)}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600 text-sm uppercase">Multa e Acréscimos</span>
+                    <span className="text-red-600 font-bold">+ {fmt(taxas?.taxas?.[0]?.acrescimos || 11.48)}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 bg-red-50 rounded-lg px-4 mt-2">
+                    <span className="text-red-700 font-bold uppercase">Total a Regularizar</span>
+                    <span className="text-red-600 font-black text-2xl">{fmt(taxas?.total)}</span>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Alerta */}
+            <div style={{ background: '#fff3cd', borderLeft: '4px solid #ffc107' }} className="p-4 flex items-start gap-3">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#856404' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              </svg>
+              <div>
+                <p className="font-bold text-[13px]" style={{ color: '#856404' }}>Atenção: Débito pendente</p>
+                <p className="text-[12px]" style={{ color: '#856404' }}>
+                  Regularize para evitar suspensão do serviço e inscrição em dívida ativa.
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </main>
