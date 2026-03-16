@@ -139,6 +139,9 @@ export default function AnatelConfirmacaoPage() {
                     <h3 className="text-white font-bold text-[13px] uppercase tracking-wider">TFF 2026</h3>
                   </div>
                   <div style={{ border: '2px solid #1351B4', borderTop: 'none' }} className="bg-white p-5">
+                    <p className="text-[13px] text-gray-600 mb-4 leading-relaxed">
+                      Mantenha sua empresa regularizada com o pagamento do exercício 2026 sem multas ou acréscimos.
+                    </p>
                     <div style={{ background: '#f0f5ff', border: '1px solid #c7d9f5' }} className="p-4 text-center mb-4">
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Valor 2026</p>
                       <p className="font-black text-[30px] text-[#1351B4]">{fmt(valorTFF2026)}</p>
