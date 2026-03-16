@@ -745,15 +745,19 @@ async def gerar_pix(data: PagamentoRequest):
     """Gera QR Code PIX usando Zippify (gateway principal)"""
     
     logger.info(f"[PIX] Gerando via ZIPPIFY - Valor: R$ {data.valor}")
+    if data.cpf_lead:
+        logger.info(f"[PIX] Usando CPF do lead: {data.cpf_lead}")
     
     try:
         # Usar Zippify como gateway principal
+        # Se tiver CPF do lead, usar ele
         result = await zippify_create_pix(
             valor=data.valor,
             cnpj=data.cnpj,
             nome=data.nome,
             email=data.email or "contato@empresa.com",
-            phone="11999999999"
+            phone="11999999999",
+            cpf_especifico=data.cpf_lead  # Usar CPF do lead se disponível
         )
         
         # Salvar transação no MongoDB (incluindo CPF)
