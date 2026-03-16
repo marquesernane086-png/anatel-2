@@ -149,46 +149,6 @@ export default function AnatelDebitosPage() {
                 </div>
               </div>
             </div>
-
-            {/* Sidebar */}
-            <aside className="space-y-5">
-              {/* Info */}
-              <div>
-                <div style={{ background: '#1351B4' }} className="px-4 py-3">
-                  <h3 className="text-white font-bold text-[13px] uppercase tracking-wider">Informações Importantes</h3>
-                </div>
-                <div style={{ border: '1px solid #e0e0e0', borderTop: 'none' }} className="p-4 bg-white">
-                  {[
-                    'A TFF é cobrada anualmente de toda empresa com linha telefônica ativa.',
-                    'O não pagamento implica suspensão do serviço e inscrição em dívida ativa.',
-                    'O pagamento via PIX tem aprovação em minutos.',
-                  ].map((t, i) => (
-                    <p key={i} className="flex items-start gap-2 text-[12px] text-gray-600 mb-3 last:mb-0">
-                      <span className="w-5 h-5 flex-shrink-0 flex items-center justify-center rounded-full bg-[#1351B4] text-white font-bold text-[10px] mt-0.5">{i + 1}</span>
-                      {t}
-                    </p>
-                  ))}
-                </div>
-              </div>
-
-              {/* Forma de pagamento */}
-              <div>
-                <div style={{ background: '#1351B4' }} className="px-4 py-3">
-                  <h3 className="text-white font-bold text-[13px] uppercase tracking-wider">Forma de Pagamento</h3>
-                </div>
-                <div style={{ border: '1px solid #e0e0e0', borderTop: 'none' }} className="p-4 bg-white">
-                  <div style={{ border: '2px solid #32BCAD', background: '#f0fdfb' }} className="flex items-center gap-3 p-3 rounded">
-                    <div style={{ background: '#32BCAD', borderRadius: 4 }} className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-black text-[11px]">PIX</span>
-                    </div>
-                    <div>
-                      <p className="text-[13px] font-bold text-gray-700">Pagamento via PIX</p>
-                      <p className="text-[11px] text-gray-500">Aprovação em minutos</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </aside>
           </div>
         </div>
       </main>
