@@ -1,57 +1,45 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import AnatelHeader from '@/components/AnatelHeader';
 import AnatelFooter from '@/components/AnatelFooter';
-import { CheckCircle2, Radio, Download, Calendar } from 'lucide-react';
+import { CheckCircle2, Download, Calendar, Info, Printer } from 'lucide-react';
 
 const AnatelConfirmacaoPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Dados com fallback seguro
+
   const valor = location.state?.valor || 68.86;
   const cnpj = location.state?.cnpj || '';
-  const dadosEmpresa = location.state?.dadosEmpresa || { nome: 'Contribuinte', cnpj: cnpj };
+  const dadosEmpresa = location.state?.dadosEmpresa || { nome: 'Contribuinte', cnpj };
   const cpfUtilizado = location.state?.cpfUtilizado || null;
-  
-  const [mostrarOpcao2026, setMostrarOpcao2026] = useState(true);
 
-  // Valor da taxa 2026 (sem multa)
+  const [mostrarOpcao2026, setMostrarOpcao2026] = useState(true);
   const valorTaxa2026 = 57.38;
 
-  const formatarValor = (v) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(v || 0);
-  };
+  const formatarValor = (v) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
 
   const formatarCNPJ = (c) => {
     if (!c) return 'N/A';
-    const numeros = c.replace(/\D/g, '');
-    if (numeros.length !== 14) return c;
-    return numeros.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+    const n = c.replace(/\D/g, '');
+    if (n.length !== 14) return c;
+    return n.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
   };
 
   const dataHoje = new Date().toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
   });
 
   const regularizar2026 = () => {
     navigate('/anatel/pagamento', {
       state: {
-        dadosEmpresa: dadosEmpresa,
+        dadosEmpresa,
         taxas: {
           total: valorTaxa2026,
           taxas: [{
-            tipo: "TFF – Taxa de Fiscalização de Funcionamento",
-            periodo: "Exercício 2026",
+            tipo: 'TFF – Taxa de Fiscalização de Funcionamento',
+            periodo: 'Exercício 2026',
             principal: valorTaxa2026,
             acrescimos: 0,
             total_item: valorTaxa2026
@@ -64,132 +52,159 @@ const AnatelConfirmacaoPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f0f4f8]">
-      <AnatelHeader />
+    <div className="min-h-screen flex flex-col bg-[#F8F8F8]" style={{ fontFamily: "'Rawline', 'Segoe UI', system-ui, sans-serif" }}>
+      <AnatelHeader breadcrumb="Comprovante de Regularização" />
+
+      {/* Banner verde */}
+      <div style={{ backgroundColor: '#168821' }} className="w-full py-6 px-4">
+        <div className="max-w-[1200px] mx-auto flex items-center gap-4">
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow">
+            <CheckCircle2 className="w-7 h-7 text-[#168821]" />
+          </div>
+          <div>
+            <p className="text-green-100 text-xs font-bold uppercase tracking-widest mb-0.5">Pagamento Confirmado</p>
+            <h1 className="text-white text-xl sm:text-2xl font-bold">Débito FISTEL exercício 2025 regularizado</h1>
+          </div>
+        </div>
+      </div>
 
       <main className="flex-1 py-8">
-        <div className="max-w-lg mx-auto px-4">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-3 gap-6">
 
-          {/* Sucesso */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#168821] rounded-full mb-3">
-              <CheckCircle2 className="w-10 h-10 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-[#071D41]">
-              Pagamento Confirmado
-            </h1>
-            <p className="text-sm text-gray-600 mt-1">
-              Débito FISTEL exercício 2025 regularizado
-            </p>
-          </div>
+            {/* Comprovante */}
+            <div className="lg:col-span-2 space-y-4">
+              <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden" data-testid="comprovante">
+                {/* Cabeçalho do comprovante */}
+                <div style={{ backgroundColor: '#071D41' }} className="px-5 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-white">
+                    <CheckCircle2 className="w-4 h-4 text-[#FFCD07]" />
+                    <span className="font-bold text-sm uppercase tracking-wide">Comprovante de Regularização FISTEL</span>
+                  </div>
+                  <span className="text-green-300 text-xs font-bold">QUITADO</span>
+                </div>
 
-          {/* Comprovante */}
-          <Card className="bg-white border-0 shadow-md mb-4 overflow-hidden">
-            <div className="bg-[#071D41] px-4 py-3">
-              <div className="flex items-center gap-2 text-white">
-                <Radio className="w-4 h-4" />
-                <span className="text-sm font-semibold">Comprovante de Regularização</span>
-              </div>
-            </div>
-            <CardContent className="p-4">
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-500">Contribuinte</span>
-                  <span className="font-semibold text-[#071D41] text-right text-xs max-w-[55%] uppercase">
-                    {dadosEmpresa?.nome || 'N/A'}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-500">CNPJ</span>
-                  <span className="font-semibold text-[#071D41]">{formatarCNPJ(cnpj)}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-500">Taxa</span>
-                  <span className="font-semibold text-[#071D41]">TFF 2025</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-500">Valor pago</span>
-                  <span className="font-bold text-[#168821] text-lg">{formatarValor(valor)}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-500">Pagamento</span>
-                  <span className="font-semibold text-[#071D41]">PIX</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-500">Data/Hora</span>
-                  <span className="font-semibold text-[#071D41]">{dataHoje}</span>
-                </div>
-              </div>
+                <div className="p-6">
+                  {/* Tabela de dados */}
+                  <table className="w-full text-sm mb-5">
+                    <tbody className="divide-y divide-gray-100">
+                      <tr>
+                        <td className="py-3 text-gray-500 text-xs font-medium w-2/5">Contribuinte</td>
+                        <td className="py-3 text-[#071D41] font-bold text-xs uppercase text-right">{dadosEmpresa?.nome || 'N/A'}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 text-gray-500 text-xs font-medium">CNPJ</td>
+                        <td className="py-3 text-[#071D41] font-bold text-sm text-right">{formatarCNPJ(cnpj)}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 text-gray-500 text-xs font-medium">Taxa</td>
+                        <td className="py-3 text-[#071D41] font-bold text-sm text-right">TFF 2025</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 text-gray-500 text-xs font-medium">Modalidade</td>
+                        <td className="py-3 text-[#071D41] font-bold text-sm text-right">Pagamento via PIX</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 text-gray-500 text-xs font-medium">Data / Hora</td>
+                        <td className="py-3 text-[#071D41] font-bold text-sm text-right">{dataHoje}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 text-gray-500 text-xs font-medium">Valor pago</td>
+                        <td className="py-3 font-extrabold text-xl text-[#168821] text-right" data-testid="valor-pago">
+                          {formatarValor(valor)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-              <div className="mt-4 bg-[#e8f5e9] rounded-lg p-3 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#168821] flex-shrink-0" />
-                <span className="text-xs text-[#168821] font-medium">
-                  Baixa no sistema Anatel em até 2 horas úteis
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Opção 2026 */}
-          {mostrarOpcao2026 && (
-            <Card className="bg-white border-2 border-[#1351b4] shadow-md mb-4 overflow-hidden">
-              <div className="bg-[#1351b4] px-4 py-3">
-                <div className="flex items-center gap-2 text-white">
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Taxa TFF 2026</span>
-                </div>
-              </div>
-              <CardContent className="p-4">
-                <p className="text-sm text-gray-700 mb-4">
-                  Antecipe o pagamento do exercício 2026 e mantenha sua empresa regularizada.
-                </p>
-
-                <div className="bg-[#f0f5ff] rounded-lg p-4 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600 text-sm">Valor</span>
-                    <span className="font-bold text-2xl text-[#1351b4]">{formatarValor(valorTaxa2026)}</span>
+                  {/* Aviso de baixa */}
+                  <div className="flex items-center gap-3 bg-[#E8F5E9] border border-[#A5D6A7] rounded p-4">
+                    <CheckCircle2 className="w-5 h-5 text-[#168821] flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-[#168821]">Regularização confirmada</p>
+                      <p className="text-xs text-[#2E7D32] mt-0.5">Baixa no sistema ANATEL em até 2 horas úteis</p>
+                    </div>
                   </div>
                 </div>
-                
-                <Button
-                  onClick={regularizar2026}
-                  className="w-full bg-[#1351b4] hover:bg-[#0c3d91] text-white font-semibold py-4 cursor-pointer"
-                >
-                  Pagar TFF 2026
-                </Button>
 
+                {/* Ações */}
+                <div className="border-t border-gray-200 px-5 py-4 flex flex-col sm:flex-row gap-3 bg-[#F8F8F8]">
+                  <button
+                    onClick={() => window.print()}
+                    className="flex items-center justify-center gap-2 border border-[#071D41] text-[#071D41] hover:bg-[#071D41] hover:text-white text-sm font-bold px-5 py-2.5 rounded transition-colors cursor-pointer"
+                  >
+                    <Printer className="w-4 h-4" />
+                    Imprimir
+                  </button>
+                  <button
+                    onClick={() => window.print()}
+                    className="flex items-center justify-center gap-2 border border-gray-300 text-gray-600 hover:bg-gray-100 text-sm font-medium px-5 py-2.5 rounded transition-colors cursor-pointer"
+                  >
+                    <Download className="w-4 h-4" />
+                    Salvar comprovante
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar — Opção 2026 + Info */}
+            <div className="space-y-4">
+              {/* Card Pagar 2026 */}
+              {mostrarOpcao2026 && (
+                <div className="bg-white border-2 border-[#1351B4] rounded shadow-sm overflow-hidden">
+                  <div style={{ backgroundColor: '#1351B4' }} className="px-5 py-3 flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-[#FFCD07]" />
+                    <span className="text-white font-bold text-sm">Antecipar TFF 2026</span>
+                  </div>
+                  <div className="p-5">
+                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                      Mantenha sua empresa regularizada antecipando o pagamento do exercício 2026 sem multas.
+                    </p>
+                    <div className="bg-[#F0F5FF] border border-[#1351B4]/20 rounded p-4 mb-4 text-center">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Valor 2026</p>
+                      <p className="text-3xl font-extrabold text-[#1351B4]">{formatarValor(valorTaxa2026)}</p>
+                      <p className="text-xs text-green-600 font-medium mt-1">Sem multa ou acréscimos</p>
+                    </div>
+                    <button
+                      data-testid="btn-pagar-2026"
+                      onClick={regularizar2026}
+                      className="w-full bg-[#1351B4] hover:bg-[#0c3d91] text-white font-bold text-sm py-3 rounded transition-colors cursor-pointer mb-2"
+                    >
+                      Pagar TFF 2026 agora
+                    </button>
+                    <button
+                      onClick={() => setMostrarOpcao2026(false)}
+                      className="w-full text-gray-400 hover:text-gray-600 text-xs py-1.5 transition-colors cursor-pointer"
+                    >
+                      Pagar depois
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Info */}
+              <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+                <div className="border-b border-gray-200 px-5 py-3 flex items-center gap-2">
+                  <Info className="w-4 h-4 text-[#1351B4]" />
+                  <h3 className="text-[#071D41] font-bold text-sm">Informações</h3>
+                </div>
+                <div className="p-5 space-y-3 text-xs text-gray-600">
+                  <p>Central de Atendimento: <strong className="text-[#071D41]">0800 728 9998</strong></p>
+                  <p>Seg. a Sex. — 8h às 20h</p>
+                  <a href="#" className="text-[#1351B4] hover:underline block">www.gov.br/anatel</a>
+                </div>
+              </div>
+
+              {!mostrarOpcao2026 && (
                 <button
-                  onClick={() => setMostrarOpcao2026(false)}
-                  className="w-full text-gray-400 text-xs mt-3 hover:text-gray-600 cursor-pointer"
+                  onClick={() => navigate('/anatel')}
+                  className="w-full bg-[#071D41] hover:bg-[#0c2d4a] text-white font-bold text-sm py-3 rounded transition-colors cursor-pointer"
                 >
-                  Pagar depois
+                  Voltar ao início
                 </button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Ações */}
-          <div className="space-y-3">
-            <Button
-              onClick={() => window.print()}
-              variant="outline"
-              className="w-full border-[#071D41] text-[#071D41] hover:bg-[#071D41] hover:text-white cursor-pointer"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Salvar comprovante
-            </Button>
-
-            <Button
-              onClick={() => navigate('/anatel')}
-              className="w-full bg-[#071D41] hover:bg-[#0c2d4a] text-white font-semibold py-4 cursor-pointer"
-            >
-              Voltar ao início
-            </Button>
+              )}
+            </div>
           </div>
-
-          <p className="text-center text-xs text-gray-400 mt-6">
-            Anatel 0800 728 9998 | www.gov.br/anatel
-          </p>
         </div>
       </main>
 
