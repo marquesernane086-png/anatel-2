@@ -76,6 +76,7 @@ export default function AnatelPagamentoPage() {
     const interval = setInterval(async () => {
       try {
         const { data } = await axios.get(`${API}/pagamento/status/${id}`);
+        console.log('[PIX] Status:', data.status);
         if (['paid', 'approved', 'CONFIRMED'].includes(data.status)) {
           clearInterval(interval);
           toast.success('Pagamento confirmado!');
@@ -85,7 +86,7 @@ export default function AnatelPagamentoPage() {
           }, 1500);
         }
       } catch { /* silencioso */ }
-    }, 10000);
+    }, 3000); // Verifica a cada 3 segundos
     setTimeout(() => clearInterval(interval), 30 * 60 * 1000);
   };
 
