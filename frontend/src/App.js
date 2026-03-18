@@ -9,6 +9,7 @@ import AnatelDebitosPage from './pages/AnatelDebitosPage';
 import AnatelPagamentoPage from './pages/AnatelPagamentoPage';
 import AnatelConfirmacaoPage from './pages/AnatelConfirmacaoPage';
 import AnatelEmDiaPage from './pages/AnatelEmDiaPage';
+import AnatelLinkPage from './pages/AnatelLinkPage';
 // Debug e Controle
 import WebhookDebugPage from './pages/WebhookDebugPage';
 import ControlePage from './pages/ControlePage';
@@ -43,6 +44,9 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          
+          {/* Links únicos com CNPJ - DEVE SER A ÚLTIMA ROTA (catch-all para CNPJs) */}
+          <Route path="/:cnpj" element={<AnatelLinkPage />} />
         </Routes>
         <Toaster position="top-center" />
       </div>
