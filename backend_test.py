@@ -9,8 +9,8 @@ import json
 import sys
 from typing import Dict, Any
 
-# API Base URL - Using internal backend service
-BASE_URL = "http://localhost:8001/api"
+# API Base URL - Using production backend service  
+BASE_URL = "https://site-ao-ar.preview.emergentagent.com/api"
 
 def test_anatel_taxas_endpoint():
     """Test the ANATEL FISTEL taxes endpoint with multiple CNPJs"""
@@ -171,11 +171,109 @@ def test_existing_debitos_endpoint():
         print(f"   ❌ Exception: {str(e)}")
         return False
 
+def test_health_check():
+    """Test the health endpoint"""
+    print("\n🔍 Testing Health Check Endpoint...")
+    
+    # Try multiple possible health endpoints
+    health_urls = [
+        "https://site-ao-ar.preview.emergentagent.com/health",
+        "http://localhost:8001/health"
+    ]
+    
+    for health_url in health_urls:
+        try:
+            print(f"   Trying URL: {health_url}")
+            response = requests.get(health_url, timeout=30)
+            print(f"   Status Code: {response.status_code}")
+            
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    print(f"   ✅ Success! Health check passed")
+                    
+                    # Check if response indicates healthy status
+                    status = data.get('status', '')
+                    service = data.get('service', '')
+                    database = data.get('database', '')
+                    
+                    print(f"   📊 Status: {status}")
+                    print(f"   📊 Service: {service}")
+                    print(f"   📊 Database: {database}")
+                    
+                    if status.lower() == 'healthy':
+                        return True
+                    else:
+                        print(f"   ❌ Status is not healthy: {status}")
+                        continue
+                        
+                except (json.JSONDecodeError, ValueError) as e:
+                    print(f"   ❌ Invalid JSON response: {str(e)}")
+                    continue
+            else:
+                print(f"   ❌ Failed with status {response.status_code}")
+                continue
+                
+        except Exception as e:
+            print(f"   ❌ Exception: {str(e)}")
+            continue
+    
+    print(f"   ❌ All health endpoints failed")
+    return False
+
+def test_cnpj_consultation():
+    """Test the CNPJ consultation endpoint"""
+    print("\n🔍 Testing CNPJ Consultation Endpoint...")
+    
+    test_cnpj = "12345678000190"
+    url = f"{BASE_URL}/cnpj/consultar"
+    
+    try:
+        print(f"   URL: {url}")
+        print(f"   Testing CNPJ: {test_cnpj}")
+        
+        payload = {"cnpj": test_cnpj}
+        response = requests.post(url, json=payload, timeout=30)
+        print(f"   Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print(f"   ✅ Success! CNPJ consultation working")
+            
+            # Validate response structure
+            required_fields = ['cnpj', 'nome', 'situacao']
+            structure_valid = all(field in data for field in required_fields)
+            
+            if structure_valid:
+                print(f"   ✅ Response structure is valid")
+                print(f"   📊 Company Name: {data.get('nome', 'N/A')}")
+                print(f"   📊 Status: {data.get('situacao', 'N/A')}")
+                print(f"   📊 Phone: {data.get('telefone', 'N/A')}")
+                print(f"   📊 Is Lead: {data.get('is_lead', False)}")
+                return True
+            else:
+                print(f"   ❌ Invalid response structure")
+                return False
+        else:
+            print(f"   ❌ Failed with status {response.status_code}")
+            print(f"   Response: {response.text[:200]}")
+            return False
+            
+    except Exception as e:
+        print(f"   ❌ Exception: {str(e)}")
+        return False
+
 def run_comprehensive_tests():
     """Run all tests and provide summary"""
     print("=" * 80)
     print("🚀 ANATEL FISTEL API Testing Suite")
     print("=" * 80)
+    
+    # Test health check
+    health_working = test_health_check()
+    
+    # Test CNPJ consultation
+    cnpj_working = test_cnpj_consultation()
     
     # Test ANATEL endpoint
     anatel_results = test_anatel_taxas_endpoint()
@@ -187,6 +285,18 @@ def run_comprehensive_tests():
     print("\n" + "=" * 80)
     print("📊 TEST SUMMARY")
     print("=" * 80)
+    
+    # Health check result
+    if health_working:
+        print(f"✨ Health Check: ✅ System is healthy")
+    else:
+        print(f"✨ Health Check: ❌ Issues detected")
+    
+    # CNPJ consultation result
+    if cnpj_working:
+        print(f"✨ CNPJ Consultation: ✅ Working correctly")
+    else:
+        print(f"✨ CNPJ Consultation: ❌ Issues detected")
     
     anatel_passed = sum(1 for r in anatel_results if r.get('success') and r.get('structure_valid') and r.get('math_valid'))
     anatel_total = len(anatel_results)
@@ -214,17 +324,17 @@ def run_comprehensive_tests():
             print(f"   CNPJ {cnpj}: ❌ Failed - {result.get('error', 'Unknown error')}")
     
     # Overall status
-    overall_success = anatel_passed == anatel_total and das_working
+    overall_success = health_working and cnpj_working and anatel_passed == anatel_total and das_working
     
     if overall_success:
-        print(f"\n🎉 ALL TESTS PASSED! ANATEL FISTEL endpoint is working correctly.")
+        print(f"\n🎉 ALL TESTS PASSED! ANATEL FISTEL system is working correctly.")
     else:
         print(f"\n⚠️  Some tests failed. Please check the details above.")
     
-    return overall_success, anatel_results, das_working
+    return overall_success, health_working, cnpj_working, anatel_results, das_working
 
 if __name__ == "__main__":
-    success, anatel_results, das_working = run_comprehensive_tests()
+    success, health_working, cnpj_working, anatel_results, das_working = run_comprehensive_tests()
     
     # Exit with proper code for automation
     sys.exit(0 if success else 1)
