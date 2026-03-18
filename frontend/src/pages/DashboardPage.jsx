@@ -331,8 +331,7 @@ const DashboardPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pagloop">PagLoop</SelectItem>
-                    <SelectItem value="furiapay">FuriaPay</SelectItem>
+                    <SelectItem value="zippify">Zippify</SelectItem>
                   </SelectContent>
                 </Select>
               </CardContent>

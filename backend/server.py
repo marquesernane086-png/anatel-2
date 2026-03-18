@@ -151,16 +151,16 @@ def get_active_gateway() -> str:
     try:
         if GATEWAY_FILE.exists():
             gateway = GATEWAY_FILE.read_text().strip()
-            if gateway in ['furiapay', 'pagloop']:
+            if gateway in ['furiapay', 'pagloop', 'zippify']:
                 return gateway
     except Exception as e:
         logger.error(f"Erro ao ler gateway: {e}")
-    return 'pagloop'  # Default
+    return 'zippify'  # Default
 
 def set_active_gateway(gateway: str) -> bool:
     """Define o gateway ativo"""
     try:
-        if gateway in ['furiapay', 'pagloop']:
+        if gateway in ['furiapay', 'pagloop', 'zippify']:
             GATEWAY_FILE.write_text(gateway)
             return True
     except Exception as e:
