@@ -1089,6 +1089,18 @@ async def simulate_payment(transaction_id: str):
         "cnpj": cnpj
     }
 
+
+@api_router.get("/transactions/recent")
+async def get_recent_transactions(limit: int = 10):
+    """Retorna transações recentes para debug"""
+    transactions = await db.transactions.find().sort('created_at', -1).limit(limit).to_list(length=limit)
+    
+    # Converter ObjectId para string
+    for tx in transactions:
+        tx['_id'] = str(tx['_id'])
+    
+    return {"transactions": transactions, "count": len(transactions)}
+
 # Endpoint de simulação para testes (REMOVER EM PRODUÇÃO)
 @api_router.get("/gateway/current", response_model=GatewayResponse)
 async def get_gateway():
