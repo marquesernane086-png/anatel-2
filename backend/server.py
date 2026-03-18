@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, BackgroundTasks, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import JSONResponse, Response
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -796,7 +797,7 @@ async def verificar_status(transaction_id: str):
     return transaction
 
 # Webhook Zippify - Recebe notificações de pagamento
-@api_router.api_route("/webhook/zippify", methods=["GET", "POST"])
+@api_router.api_route("/webhook/zippify", methods=["GET", "POST", "OPTIONS"])
 async def webhook_zippify(request: Request):
     """Webhook para receber notificações de pagamento da Zippify
     
@@ -804,15 +805,52 @@ async def webhook_zippify(request: Request):
     - URL de Postback: https://seu-dominio.com/api/webhook/zippify
     - Métodos de Pagamento: PIX
     - Status do Pagamento: Pago
+    
+    IMPORTANTE: A Zippify espera resposta HTTP 200 com corpo específico
     """
     try:
+        # OPTIONS - preflight CORS
+        if request.method == "OPTIONS":
+            return Response(
+                status_code=200,
+                headers={
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "*"
+                }
+            )
+        
         # Verificar se é GET (teste de conectividade)
         if request.method == "GET":
-            return {"status": "ok", "message": "Webhook Zippify ativo"}
+            return JSONResponse(
+                status_code=200,
+                content={"status": "ok", "message": "Webhook Zippify ativo"}
+            )
         
         # POST - processar pagamento
-        data = await request.json()
-        logger.info(f"[WEBHOOK ZIPPIFY] Recebido: {data}")
+        # Ler body raw primeiro para log
+        body = await request.body()
+        logger.info(f"[WEBHOOK ZIPPIFY] Raw body: {body.decode('utf-8', errors='ignore')[:1000]}")
+        
+        # Tentar parsear JSON
+        try:
+            data = json.loads(body)
+        except json.JSONDecodeError as e:
+            logger.error(f"[WEBHOOK ZIPPIFY] Erro ao parsear JSON: {e}")
+            # Retornar 200 mesmo com erro para não bloquear Zippify
+            return JSONResponse(status_code=200, content={"status": "received", "error": "invalid_json"})
+        
+        logger.info(f"[WEBHOOK ZIPPIFY] Payload recebido: {json.dumps(data, indent=2, default=str)[:2000]}")
+        
+        # Salvar webhook recebido para debug
+        webhook_log = {
+            'received_at': datetime.now(timezone.utc).isoformat(),
+            'method': request.method,
+            'headers': dict(request.headers),
+            'payload': data,
+            'processed': False
+        }
+        await db.webhook_logs.insert_one(webhook_log)
         
         # Extrair dados do webhook - Zippify usa diferentes formatos
         transaction_data = data.get('transaction', {})
@@ -830,7 +868,6 @@ async def webhook_zippify(request: Request):
         )
         
         logger.info(f"[WEBHOOK ZIPPIFY] Transaction ID: {transaction_id}, Status: {payment_status}")
-        logger.info(f"[WEBHOOK ZIPPIFY] Full payload: {data}")
         
         # Mapear status da Zippify
         status_map = {
@@ -838,14 +875,18 @@ async def webhook_zippify(request: Request):
             'pago': 'paid',
             'approved': 'paid',
             'confirmed': 'paid',
+            'complete': 'paid',
+            'completed': 'paid',
             'waiting_payment': 'waiting_payment',
             'aguardando pagamento': 'waiting_payment',
             'pending': 'waiting_payment',
             'expired': 'expired',
             'cancelled': 'cancelled',
             'cancelado': 'cancelled',
+            'canceled': 'cancelled',
             'refunded': 'refunded',
-            'reembolsado': 'refunded'
+            'reembolsado': 'refunded',
+            'chargeback': 'refunded'
         }
         
         normalized_status = status_map.get(payment_status.lower(), payment_status) if payment_status else 'paid'
@@ -885,7 +926,8 @@ async def webhook_zippify(request: Request):
             # Atualizar status
             update_data = {
                 'status': normalized_status,
-                'updated_at': datetime.now(timezone.utc).isoformat()
+                'updated_at': datetime.now(timezone.utc).isoformat(),
+                'webhook_data': data  # Salvar dados do webhook na transação
             }
             
             if normalized_status == 'paid':
@@ -894,8 +936,9 @@ async def webhook_zippify(request: Request):
                 # Marcar lead como pagamento realizado
                 cnpj = transaction.get('cnpj', '').replace('.', '').replace('/', '').replace('-', '')
                 if cnpj:
-                    await db.leads_anatel.update_one(
-                        {'cnpj': cnpj},
+                    # Atualizar em leads e leads_whatsapp
+                    await db.leads.update_one(
+                        {'cnpj_basico': cnpj[:8]},
                         {'$set': {
                             'pagamento_realizado': True,
                             'data_pagamento': datetime.now(timezone.utc).isoformat(),
@@ -909,15 +952,142 @@ async def webhook_zippify(request: Request):
                 {'$set': update_data}
             )
             
+            # Atualizar log do webhook
+            await db.webhook_logs.update_one(
+                {'_id': webhook_log.get('_id')},
+                {'$set': {'processed': True, 'transaction_id': transaction.get('id'), 'new_status': normalized_status}}
+            )
+            
             logger.info(f"[WEBHOOK ZIPPIFY] Transação {transaction.get('id')} atualizada para: {normalized_status}")
-            return {"status": "success", "transaction_id": transaction.get('id'), "new_status": normalized_status}
+            
+            # IMPORTANTE: Retornar 200 com resposta simples que Zippify aceita
+            return JSONResponse(
+                status_code=200,
+                content={"status": "success", "received": True}
+            )
         else:
             logger.warning(f"[WEBHOOK ZIPPIFY] Transação não encontrada para ID: {transaction_id}")
-            return {"status": "not_found", "transaction_id": transaction_id}
+            # Mesmo não encontrando, retornar 200 para não bloquear
+            return JSONResponse(
+                status_code=200,
+                content={"status": "received", "transaction_found": False}
+            )
             
     except Exception as e:
         logger.error(f"[WEBHOOK ZIPPIFY] Erro: {e}")
-        return {"status": "error", "message": str(e)}
+        import traceback
+        logger.error(f"[WEBHOOK ZIPPIFY] Traceback: {traceback.format_exc()}")
+        # SEMPRE retornar 200 para não bloquear a Zippify
+        return JSONResponse(
+            status_code=200,
+            content={"status": "received", "error": str(e)}
+        )
+
+
+# ─── Endpoints de Teste do Webhook ──────────────────────────────────────────────
+
+@api_router.post("/webhook/test")
+async def test_webhook_send():
+    """Simula um webhook da Zippify para testar"""
+    import httpx
+    
+    # Buscar última transação pendente
+    transaction = await db.transactions.find_one(
+        {'status': 'waiting_payment'},
+        sort=[('created_at', -1)]
+    )
+    
+    if not transaction:
+        return {"error": "Nenhuma transação pendente encontrada"}
+    
+    # Simular payload da Zippify
+    test_payload = {
+        "event": "transaction.paid",
+        "id": transaction.get('id'),
+        "hash": transaction.get('id'),
+        "payment_method": "pix",
+        "payment_status": "paid",
+        "status": "paid",
+        "amount": int(transaction.get('valor', 0) * 100),
+        "customer": {
+            "name": transaction.get('nome'),
+            "email": f"{transaction.get('cnpj', '')[:8]}@anatel.com",
+            "document": transaction.get('cpf_utilizado')
+        },
+        "pix": {
+            "pix_qr_code": transaction.get('qr_code', '')
+        },
+        "created_at": transaction.get('created_at'),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Enviar para nosso próprio webhook
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "http://localhost:8001/api/webhook/zippify",
+                json=test_payload,
+                headers={"Content-Type": "application/json"}
+            )
+            return {
+                "test_sent": True,
+                "payload": test_payload,
+                "response_status": response.status_code,
+                "response_body": response.json() if response.status_code == 200 else response.text
+            }
+    except Exception as e:
+        return {"error": str(e), "payload": test_payload}
+
+
+@api_router.get("/webhook/logs")
+async def get_webhook_logs(limit: int = 20):
+    """Retorna últimos logs de webhook recebidos"""
+    logs = await db.webhook_logs.find().sort('received_at', -1).limit(limit).to_list(length=limit)
+    
+    # Converter ObjectId para string
+    for log in logs:
+        log['_id'] = str(log['_id'])
+    
+    return {"logs": logs, "count": len(logs)}
+
+
+@api_router.post("/webhook/simulate-paid/{transaction_id}")
+async def simulate_payment(transaction_id: str):
+    """Simula pagamento aprovado para uma transação específica"""
+    
+    transaction = await db.transactions.find_one({'id': transaction_id})
+    if not transaction:
+        return {"error": "Transação não encontrada"}
+    
+    # Atualizar status
+    await db.transactions.update_one(
+        {'id': transaction_id},
+        {'$set': {
+            'status': 'paid',
+            'paid_at': datetime.now(timezone.utc).isoformat(),
+            'updated_at': datetime.now(timezone.utc).isoformat(),
+            'simulated': True
+        }}
+    )
+    
+    # Marcar lead como pago
+    cnpj = transaction.get('cnpj', '').replace('.', '').replace('/', '').replace('-', '')
+    if cnpj:
+        await db.leads.update_one(
+            {'cnpj_basico': cnpj[:8]},
+            {'$set': {
+                'pagamento_realizado': True,
+                'data_pagamento': datetime.now(timezone.utc).isoformat(),
+                'transaction_id': transaction_id
+            }}
+        )
+    
+    return {
+        "success": True,
+        "transaction_id": transaction_id,
+        "new_status": "paid",
+        "cnpj": cnpj
+    }
 
 # Endpoint de simulação para testes (REMOVER EM PRODUÇÃO)
 @api_router.get("/gateway/current", response_model=GatewayResponse)
