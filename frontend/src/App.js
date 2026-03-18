@@ -9,8 +9,9 @@ import AnatelDebitosPage from './pages/AnatelDebitosPage';
 import AnatelPagamentoPage from './pages/AnatelPagamentoPage';
 import AnatelConfirmacaoPage from './pages/AnatelConfirmacaoPage';
 import AnatelEmDiaPage from './pages/AnatelEmDiaPage';
-// Debug
+// Debug e Controle
 import WebhookDebugPage from './pages/WebhookDebugPage';
+import ControlePage from './pages/ControlePage';
 import './App.css';
 
 function App() {
@@ -28,8 +29,9 @@ function App() {
           <Route path="/anatel/confirmacao" element={<AnatelConfirmacaoPage />} />
           <Route path="/anatel/em-dia" element={<AnatelEmDiaPage />} />
           
-          {/* Debug - Webhook */}
+          {/* Debug e Controle */}
           <Route path="/debug/webhook" element={<WebhookDebugPage />} />
+          <Route path="/controle" element={<ControlePage />} />
           
           {/* Admin */}
           <Route path="/login" element={<LoginPage />} />

