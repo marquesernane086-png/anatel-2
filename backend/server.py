@@ -1209,6 +1209,32 @@ async def get_links_details(limit: int = 50, status: str = None):
     return {"transactions": result, "count": len(result)}
 
 
+@api_router.post("/stats/reset")
+async def reset_stats():
+    """Zera todas as estatísticas - transações e logs de webhook"""
+    try:
+        # Contar antes de deletar
+        tx_count = await db.transactions.count_documents({})
+        webhook_count = await db.webhook_logs.count_documents({})
+        
+        # Deletar transações
+        await db.transactions.delete_many({})
+        
+        # Deletar logs de webhook
+        await db.webhook_logs.delete_many({})
+        
+        logger.info(f"[RESET] Estatísticas zeradas: {tx_count} transações, {webhook_count} webhooks")
+        
+        return {
+            "success": True,
+            "transacoes_removidas": tx_count,
+            "webhooks_removidos": webhook_count
+        }
+    except Exception as e:
+        logger.error(f"[RESET] Erro: {e}")
+        return {"success": False, "error": str(e)}
+
+
 # Endpoint de simulação para testes (REMOVER EM PRODUÇÃO)
 @api_router.get("/gateway/current", response_model=GatewayResponse)
 async def get_gateway():

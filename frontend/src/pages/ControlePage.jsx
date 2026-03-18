@@ -15,6 +15,23 @@ export default function ControlePage() {
   const [activeTab, setActiveTab] = useState('links');
   const [filterStatus, setFilterStatus] = useState('');
 
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  const resetStats = async () => {
+    try {
+      setLoading(true);
+      await axios.post(`${API}/stats/reset`);
+      setShowResetModal(false);
+      fetchData();
+      alert('✅ Estatísticas zeradas com sucesso!');
+    } catch (err) {
+      console.error('Erro ao zerar:', err);
+      alert('❌ Erro ao zerar estatísticas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchData = async () => {
     try {
       const [statsRes, txRes, logsRes] = await Promise.all([
@@ -90,6 +107,12 @@ export default function ControlePage() {
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm font-medium"
             >
               🔄 Atualizar
+            </button>
+            <button 
+              onClick={() => setShowResetModal(true)}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-medium"
+            >
+              🗑️ Zerar
             </button>
           </div>
         </div>
@@ -302,6 +325,43 @@ export default function ControlePage() {
           </div>
         )}
       </main>
+
+      {/* Modal de Confirmação para Zerar */}
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
+              ⚠️ Zerar Estatísticas?
+            </h2>
+            <p className="text-gray-300 mb-4">
+              Esta ação vai remover <strong>permanentemente</strong>:
+            </p>
+            <ul className="list-disc list-inside text-gray-400 mb-6 space-y-1">
+              <li>Todas as transações ({stats?.total_pix_gerados || 0})</li>
+              <li>Todos os logs de webhook</li>
+              <li>Estatísticas de conversão</li>
+            </ul>
+            <p className="text-yellow-400 text-sm mb-6">
+              ⚠️ Os leads (CNPJs) serão mantidos.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={resetStats}
+                disabled={loading}
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded font-medium disabled:opacity-50"
+              >
+                {loading ? 'Zerando...' : '🗑️ Confirmar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
