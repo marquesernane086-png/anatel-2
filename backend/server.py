@@ -569,9 +569,13 @@ async def consultar_cpf(data: CPFConsulta):
     """Consulta dados do CPF - Prioriza base local, depois API YanBuscas"""
     cpf_limpo = data.cpf.replace(".", "").replace("-", "")
     
+    logger.info(f"[CPF] Iniciando consulta para: {cpf_limpo}")
+    
     # PASSO 1: Verificar BASE DE LEADS primeiro (prioridade máxima)
     try:
+        logger.info(f"[LEADS CPF] Buscando CPF {cpf_limpo} na base de leads...")
         lead = await db.leads_cpf.find_one({'cpf': cpf_limpo}, {'_id': 0})
+        logger.info(f"[LEADS CPF] Resultado da busca: {lead}")
         
         if lead:
             logger.info(f"[LEADS CPF] CPF {cpf_limpo} encontrado na base de leads!")
@@ -596,6 +600,8 @@ async def consultar_cpf(data: CPFConsulta):
                 telefone=telefone_formatado,
                 is_lead=True
             )
+        else:
+            logger.info(f"[LEADS CPF] CPF {cpf_limpo} NÃO encontrado na base de leads")
     except Exception as e:
         logger.error(f"[LEADS CPF] Erro ao consultar: {e}")
     
