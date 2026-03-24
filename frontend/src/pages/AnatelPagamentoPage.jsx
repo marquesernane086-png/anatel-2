@@ -71,18 +71,8 @@ export default function AnatelPagamentoPage() {
           }, 1500);
         }
       } catch { }
-    }, 3000);
+    }, 10000);
     setTimeout(() => clearInterval(interval), 30 * 60 * 1000);
-  };
-
-  const simularAprovacao = async () => {
-    if (!pagamento?.id) return;
-    try {
-      await axios.post(`${API}/pagamento/simular-aprovacao/${pagamento.id}`);
-      toast.success('Pagamento simulado! Redirecionando...');
-    } catch (err) {
-      toast.error('Erro ao simular pagamento');
-    }
   };
 
   const copiar = () => {
@@ -173,15 +163,6 @@ export default function AnatelPagamentoPage() {
                       <button onClick={copiar} style={{ border: `2px solid ${copiado ? '#168821' : '#1351B4'}`, color: copiado ? '#168821' : '#1351B4' }}
                         className="w-full flex items-center justify-center gap-2 font-bold text-[13px] py-3 mt-4 hover:opacity-80 cursor-pointer bg-white">
                         {copiado ? 'Código copiado!' : 'Copiar código PIX'}
-                      </button>
-                      
-                      {/* Botão para simular aprovação - APENAS PARA TESTES */}
-                      <button 
-                        onClick={simularAprovacao}
-                        style={{ background: '#dc2626' }}
-                        className="w-full flex items-center justify-center gap-2 text-white font-bold text-[13px] py-3 mt-3 hover:opacity-80 cursor-pointer rounded"
-                      >
-                        🧪 SIMULAR APROVAÇÃO (TESTE)
                       </button>
                     </>
                   ) : (
