@@ -182,13 +182,13 @@ export default function AnatelHomePage() {
                   )}
 
                   {/* Alerta */}
-                  <div style={{ background: '#fff3cd', borderLeft: '4px solid #ffc107' }} className="p-4 flex items-start gap-3 mb-24">
-                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#856404' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div style={{ background: '#fee2e2', borderLeft: '4px solid #dc2626' }} className="p-4 flex items-start gap-3 mb-24">
+                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#dc2626' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                     </svg>
                     <div>
-                      <p className="font-bold text-[13px]" style={{ color: '#856404' }}>Atenção: Débito pendente</p>
-                      <p className="text-[12px]" style={{ color: '#856404' }}>
+                      <p className="font-bold text-[13px]" style={{ color: '#991b1b' }}>Atenção: Débito pendente</p>
+                      <p className="text-[12px]" style={{ color: '#991b1b' }}>
                         Regularize para evitar suspensão do serviço e inscrição em dívida ativa.
                       </p>
                     </div>
